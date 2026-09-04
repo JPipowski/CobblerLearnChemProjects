@@ -4,3 +4,4 @@ using Matplotlib.
 This is part of the CobberLearnChem Machine Learning course
 through Concordia College.
 
+Alongside the assigned coding projects, I will be keeping a private ethics portfolio where I reflect on my learning and how it impacts the kind of scientists I am developing into. 
