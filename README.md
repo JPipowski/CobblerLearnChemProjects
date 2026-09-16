@@ -8,4 +8,6 @@ PubChemFetcher is a code designed to pull particular chemical information from P
 
 MoleculeExplorer is a code designed to pull the SMILES code string out and place it into RDKit for analysis. It should allow the user to look at multiple molecular discriptors without restarting the program.
 
+The code developed in Ch.6 Analysis Questions Part 1 - 5 was used to Answer the analysis questions with the textbook peppered throughout the Sixth chapter. 
+
 Alongside the assigned coding projects, I will be keeping a private ethics portfolio where I reflect on my learning and how it impacts the kind of scientists I am developing into. 
