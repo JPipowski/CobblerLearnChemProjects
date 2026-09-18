@@ -4,7 +4,7 @@ from sklearn.linear_model import LinearRegression
 import matplotlib.pyplot as plt
 
 # 1. Load data
-df_original = pd.read_csv("alkane_dataset.csv")
+df_original = pd.read_csv("../CobberImpute/alkane_dataset.csv")
 df_imputed = df_original.copy()
 
 # 2. Complete predictor variables (0 missing values)
