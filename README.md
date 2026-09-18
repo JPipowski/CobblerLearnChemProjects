@@ -10,4 +10,8 @@ MoleculeExplorer is a code designed to pull the SMILES code string out and place
 
 The code developed in Ch.6 Analysis Questions Part 1 - 5 was used to Answer the analysis questions with the textbook peppered throughout the Sixth chapter. 
 
+The code developed in Ch. 5 Analysis Questions was use to answer the analysis questions within the textbook.
+
+The code in CobblerImpute was developed to perfrom a listwise deletion and see how it impacts the bias in the data. The file labeled listwise_deletion_bias.png is the plot generated from this code. 
+
 Alongside the assigned coding projects, I will be keeping a private ethics portfolio where I reflect on my learning and how it impacts the kind of scientists I am developing into. 
