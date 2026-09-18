@@ -2,9 +2,7 @@ import subprocess
 import matplotlib.pyplot as plt
 import pandas as pd
 import seaborn as sns
-from sklearn.ensemble import RandomForestRegressor
-from sklearn.experimental import enable_iterative_imputer  # noqa: F401
-from sklearn.impute import IterativeImputer
+from sklearn.impute import KNNImputer
 
 # 1. Load original data
 df_original = pd.read_csv("alkane_dataset.csv")
@@ -20,21 +18,18 @@ num_cols = [
     "branch number",
 ]
 
-# 3. Perform Random Forest Imputation (Iterative Multi-Pass Imputation)
-estimator = RandomForestRegressor(n_estimators=100, random_state=42)
-imputer = IterativeImputer(
-    estimator=estimator, max_iter=10, random_state=42
-)
+# 3. Perform KNN Imputation
+imputer = KNNImputer(n_neighbors=5)
 
-df_rf_imputed = pd.DataFrame(
+df_knn_imputed = pd.DataFrame(
     imputer.fit_transform(df_original[num_cols]), columns=num_cols
 )
 
 # 4. Compute feature means and percentage bias
 mean_orig = df_original[num_cols].mean()
-mean_rf = df_rf_imputed[num_cols].mean()
+mean_knn = df_knn_imputed[num_cols].mean()
 
-pct_bias = ((mean_rf - mean_orig) / mean_orig) * 100
+pct_bias = ((mean_knn - mean_orig) / mean_orig) * 100
 
 # 5. Build and Save Bias Plot
 plt.figure(figsize=(10, 5), dpi=300)
@@ -44,7 +39,7 @@ plt.barh(pct_bias.index, pct_bias, color=bar_colors, edgecolor="black")
 plt.axvline(0, color="black", linestyle="--", linewidth=1)
 
 plt.title(
-    "Bias Introduced by Random Forest Imputation (% Change in Mean)",
+    "Bias Introduced by KNN Imputation (% Change in Mean)",
     fontsize=12,
 )
 plt.xlabel("Percentage Shift in Mean (%)", fontsize=10)
@@ -52,14 +47,14 @@ plt.ylabel("Property", fontsize=10)
 plt.grid(axis="x", linestyle=":", alpha=0.6)
 plt.tight_layout()
 
-bias_image_path = "rf_imputation_bias.png"
+bias_image_path = "knn_imputation_bias.png"
 plt.savefig(bias_image_path, dpi=300, bbox_inches="tight")
 plt.close()
 
 # 6. Compute, Print, and Build Correlation Matrix Heatmap
-corr_matrix = df_rf_imputed.corr()
+corr_matrix = df_knn_imputed.corr()
 
-print("=== CORRELATION MATRIX (RANDOM FOREST IMPUTED DATA) ===")
+print("=== CORRELATION MATRIX (KNN IMPUTED DATA) ===")
 print(corr_matrix.round(3).to_string())
 
 plt.figure(figsize=(9, 7), dpi=300)
@@ -72,7 +67,7 @@ sns.heatmap(
     cbar_kws={"shrink": 0.8},
     linewidths=0.5,
 )
-plt.title("Property Correlation Matrix (RF Imputed)", fontsize=12)
+plt.title("Property Correlation Matrix (KNN Imputed)", fontsize=12)
 plt.tight_layout()
 
 corr_image_path = "correlation_matrix.png"
@@ -92,7 +87,7 @@ try:
             "git",
             "commit",
             "-m",
-            "Add RF imputation bias plot and correlation matrix heatmap",
+            "Add KNN imputation bias plot and correlation matrix heatmap",
         ],
         check=True,
     )
