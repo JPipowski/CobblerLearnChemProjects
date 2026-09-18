@@ -1,9 +1,24 @@
+import argparse
 import subprocess
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 from sklearn.impute import KNNImputer
 from sklearn.metrics import mean_absolute_error
+
+# Parse command line arguments for custom commit message
+parser = argparse.ArgumentParser(
+    description="Run KNN Imputation analysis and commit output figures to Git."
+)
+parser.add_argument(
+    "-m",
+    "--message",
+    type=str,
+    default="Add KNN bias plot and prediction quality evaluation graphs",
+    help="Custom commit message for Git",
+)
+args = parser.parse_args()
+commit_message = args.message
 
 # 1. Load original data
 df_original = pd.read_csv("alkane_dataset.csv")
@@ -122,7 +137,7 @@ plt.savefig(pred_image_path, dpi=300, bbox_inches="tight")
 plt.close()
 print(f"Prediction quality chart saved to {pred_image_path}")
 
-# 8. Git Commit and Push Automation
+# 8. Git Commit and Push Automation with Custom Message
 try:
     subprocess.run(
         ["git", "add", bias_image_path, pred_image_path], check=True
@@ -132,11 +147,13 @@ try:
             "git",
             "commit",
             "-m",
-            "Add KNN bias plot and prediction quality evaluation graphs",
+            commit_message,
         ],
         check=True,
     )
     subprocess.run(["git", "push", "origin", "main"], check=True)
-    print("Successfully committed and pushed all charts to GitHub.")
+    print(
+        f"Successfully committed with message '{ CSV file Aklane dataset runs a KNN imputation then generates a bias plus prediction graph. It also generates the MAE. }' and pushed all charts to GitHub."
+    )
 except subprocess.CalledProcessError as e:
     print(f"Git execution failed: {e}")
