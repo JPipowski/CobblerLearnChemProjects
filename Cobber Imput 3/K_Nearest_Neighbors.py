@@ -137,23 +137,3 @@ plt.savefig(pred_image_path, dpi=300, bbox_inches="tight")
 plt.close()
 print(f"Prediction quality chart saved to {pred_image_path}")
 
-# 8. Git Commit and Push Automation with Custom Message
-try:
-    subprocess.run(
-        ["git", "add", bias_image_path, pred_image_path], check=True
-    )
-    subprocess.run(
-        [
-            "git",
-            "commit",
-            "-m",
-            commit_message,
-        ],
-        check=True,
-    )
-    subprocess.run(["git", "push", "origin", "main"], check=True)
-    print(
-        f"Successfully committed with message '{ CSV file Aklane dataset runs a KNN imputation then generates a bias plus prediction graph. It also generates the MAE. }' and pushed all charts to GitHub."
-    )
-except subprocess.CalledProcessError as e:
-    print(f"Git execution failed: {e}")
