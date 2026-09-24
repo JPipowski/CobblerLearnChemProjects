@@ -4,7 +4,7 @@ from rdkit.Chem import Descriptors, Crippen, Lipinski
 
 
 def get_smiles_from_pubchem(compound_name):
-    """Query PubChem and return the canonical SMILES string for a compound."""
+    """Query PubChem and return the connectivity SMILES string for a compound."""
     results = pcp.get_compounds(compound_name, 'name')
     if results:
         return results[0].connectivity_smiles
