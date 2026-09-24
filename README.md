@@ -12,6 +12,8 @@ The code developed in Ch.6 Analysis Questions Part 1 - 5 was used to Answer the 
 
 The code developed in Ch. 5 Analysis Questions was use to answer the analysis questions within the textbook.
 
-The code in CobblerImpute was developed to perfrom a listwise deletion and see how it impacts the bias in the data. The file labeled listwise_deletion_bias.png is the plot generated from this code. 
+The code in CobblerImpute was developed to perfrom a listwise deletion and see how it impacts the bias in the data. The file labeled listwise_deletion_bias.png is the plot generated from this code. The following CobberImpute 2-5 run different imputations (KNN, RF, Log-linear regression, and Ensemble Model) to compare them to the listwise deletions.
+
+The MakingDataWhole code takes the data from the Titanic dataset to run similar code to cobber Impute, but specifically for KNN and RF imputations. 
 
 Alongside the assigned coding projects, I will be keeping a private ethics portfolio where I reflect on my learning and how it impacts the kind of scientists I am developing into. 
