@@ -16,4 +16,8 @@ The code in CobblerImpute was developed to perfrom a listwise deletion and see h
 
 The MakingDataWhole code takes the data from the Titanic dataset to run similar code to cobber Impute, but specifically for KNN and RF imputations. 
 
+The CobberResidue codes walk through the importation of multiple datasets to compare MAE, MSE, and R squared of multiple types of datasets and how this values are impacted.
+
+The ErrorMetrics code performs a similar task to CobberResidue, but uses NumPy to create arrays from which plots and the MAE, MSE, and R squared values are calculated from. 
+
 Alongside the assigned coding projects, I will be keeping a private ethics portfolio where I reflect on my learning and how it impacts the kind of scientists I am developing into. 
