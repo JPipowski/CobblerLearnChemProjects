@@ -12,7 +12,7 @@ df_original = pd.read_csv("alkane_dataset.csv")
 df_clean = df_original.dropna().reset_index(drop=True)
 
 # 3. Specify target variable and predictors
-target_col = "boiling point"  # Example target feature
+target_col = "viscosity"  # Example target feature
 feature_cols = [
     "carbons",
     "molecular weight",
