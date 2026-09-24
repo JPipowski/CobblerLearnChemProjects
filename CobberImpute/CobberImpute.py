@@ -8,15 +8,28 @@ from sklearn.model_selection import train_test_split
 # 1. Load data
 df_original = pd.read_csv("alkane_dataset.csv")
 
-# 2. Perform listwise deletion
+# Track initial dataset size
+n_original = len(df_original)
+
+# 2. Perform Listwise Deletion
 df_clean = df_original.dropna().reset_index(drop=True)
 
+# Calculate deletion statistics
+n_clean = len(df_clean)
+n_deleted = n_original - n_clean
+pct_deleted = (n_deleted / n_original) * 100
+
+print("=== DATASET CLEANING REPORT ===")
+print(f"Original Row Count: {n_original}")
+print(f"Rows Retained:      {n_clean}")
+print(f"Rows Deleted:       {n_deleted}")
+print(f"Dataset Lost:       {pct_deleted:.2f}%\n")
+
 # 3. Specify target variable and predictors
-target_col = "viscosity"  # Example target feature
+target_col = "viscosity"
 feature_cols = [
     "carbons",
     "molecular weight",
-    "viscosity",
     "thermal conductivity",
     "heat capacity",
     "branch number",
@@ -59,9 +72,11 @@ plt.plot(
     label="Ideal Match (1:1)",
 )
 
+# Annotate title with both MAE and percentage lost
 plt.title(
-    f"Prediction Quality: Actual vs. Predicted {target_col.title()}\nMAE: {mae:.3f}",
-    fontsize=12,
+    f"Prediction Quality: Actual vs. Predicted {target_col.title()}\n"
+    f"MAE: {mae:.3f} | Data Lost via Listwise Deletion: {pct_deleted:.1f}%",
+    fontsize=11,
 )
 plt.xlabel(f"Actual {target_col.title()}", fontsize=10)
 plt.ylabel(f"Predicted {target_col.title()}", fontsize=10)
@@ -69,6 +84,6 @@ plt.grid(True, linestyle=":", alpha=0.6)
 plt.legend()
 plt.tight_layout()
 
-# Save image file to repository for Git tracking
+# Save image file to repository
 plt.savefig("prediction_quality.png", dpi=300)
 plt.show()
