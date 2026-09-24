@@ -2,6 +2,7 @@ import os
 import subprocess
 import matplotlib.pyplot as plt
 import numpy as np
+from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score
 
 # Output directory for saving generated plots
 output_dir = "output_plots"
@@ -14,14 +15,10 @@ predicted = np.array([2.5, 3.5, 4, 5, 6, 8.8])
 # Calculate residuals (Actual - Predicted)
 residuals = actual - predicted
 
-# 2. Compute Metrics using Pure NumPy
-mae = np.mean(np.abs(residuals))
-mse = np.mean(residuals**2)
-
-# R² = 1 - (SS_res / SS_tot)
-ss_res = np.sum(residuals**2)
-ss_tot = np.sum((actual - np.mean(actual)) ** 2)
-r2 = 1 - (ss_res / ss_tot)
+# 2. Compute Metrics using scikit-learn
+mae = mean_absolute_error(actual, predicted)
+mse = mean_squared_error(actual, predicted)
+r2 = r2_score(actual, predicted)
 
 print(f"Mean Absolute Error (MAE): {mae:.3f}")
 print(f"Mean Squared Error (MSE):  {mse:.3f}")
@@ -59,7 +56,7 @@ plt.legend()
 plt.grid(True, linestyle=":", alpha=0.6)
 plt.tight_layout()
 
-actual_vs_pred_path = os.path.join(output_dir, "actual_vs_predicted_numpy.png")
+actual_vs_pred_path = os.path.join(output_dir, "actual_vs_predicted_sklearn.png")
 plt.savefig(actual_vs_pred_path, dpi=300, bbox_inches="tight")
 plt.close()
 print(f"Saved Actual vs. Predicted plot to '{actual_vs_pred_path}'")
@@ -84,7 +81,7 @@ plt.legend()
 plt.grid(True, linestyle=":", alpha=0.6)
 plt.tight_layout()
 
-residuals_plot_path = os.path.join(output_dir, "residuals_plot_numpy.png")
+residuals_plot_path = os.path.join(output_dir, "residuals_plot_sklearn.png")
 plt.savefig(residuals_plot_path, dpi=300, bbox_inches="tight")
 plt.close()
 print(f"Saved Residuals plot to '{residuals_plot_path}'")
@@ -97,7 +94,7 @@ try:
             "git",
             "commit",
             "-m",
-            f"Add NumPy array evaluation & residual plots (MAE: {mae:.2f}, MSE: {mse:.2f}, R2: {r2:.3f})",
+            f"Add scikit-learn evaluation metrics & plots (MAE: {mae:.2f}, MSE: {mse:.2f}, R2: {r2:.3f})",
         ],
         check=True,
     )
