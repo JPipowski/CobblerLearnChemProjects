@@ -1,9 +1,19 @@
+import getpass
 import os
 import random
 import string
+import sys
 import matplotlib.pyplot as plt
 
-# Default configuration
+# GitPython import with error handling
+try:
+    from git import GitCommandError, Repo
+except ModuleNotFoundError:
+    raise ModuleNotFoundError(
+        "GitPython is missing. Run 'pip install GitPython' in your environment."
+    )
+
+# Configuration
 DEFAULT_TARGET = "METHINKS IT IS LIKE A WEASEL"
 POPULATION_SIZE = 100
 MUTATION_RATE = 0.05  # 5% chance per character to mutate
@@ -16,27 +26,51 @@ def generate_random_string(length: int) -> str:
 
 
 def calculate_fitness(candidate: str, target: str) -> int:
-    """Calculates fitness as the number of matching characters at identical positions."""
+    """Calculates fitness as matching characters at identical positions."""
     return sum(1 for c, t in zip(candidate, target) if c == t)
 
 
 def mutate(parent: str, mutation_rate: float) -> str:
     """Mutates characters in the string based on the mutation rate."""
-    child_chars = []
-    for char in parent:
-        if random.random() < mutation_rate:
-            child_chars.append(random.choice(POSSIBLE_CHARS))
-        else:
-            child_chars.append(char)
-    return "".join(child_chars)
+    return "".join(
+        random.choice(POSSIBLE_CHARS) if random.random() < mutation_rate else char
+        for char in parent
+    )
 
 
-def plot_fitness(generations: list[int], fitnesses: list[int], target_len: int,
-                 filename: str = "fitness_over_time.png"):
-    """Generates and saves a plot of fitness over generations."""
+def plot_fitness(
+    generations: list[int],
+    fitnesses: list[int],
+    target_len: int,
+    filename: str = "fitness_over_time.png",
+):
+    """Generates and saves a scatter plot of fitness over generations."""
     plt.figure(figsize=(10, 6))
-    plt.plot(generations, fitnesses, color="#2b5c8f", linewidth=2, label="Best Fitness")
-    plt.axhline(y=target_len, color="r", linestyle="--", label=f"Target Score ({target_len})")
+
+    plt.scatter(
+        generations,
+        fitnesses,
+        color="#e74c3c",
+        alpha=0.7,
+        edgecolors="none",
+        label="Generation Fitness",
+    )
+    plt.plot(
+        generations,
+        fitnesses,
+        color="#2b5c8f",
+        linestyle="--",
+        linewidth=1.5,
+        alpha=0.8,
+        label="Progress Trend",
+    )
+
+    plt.axhline(
+        y=target_len,
+        color="g",
+        linestyle="-.",
+        label=f"Target Score ({target_len})",
+    )
     plt.title("Fitness Over Generations (Weasel Program)", fontsize=14)
     plt.xlabel("Generation", fontsize=12)
     plt.ylabel("Best Fitness Score", fontsize=12)
@@ -48,12 +82,76 @@ def plot_fitness(generations: list[int], fitnesses: list[int], target_len: int,
     print(f"\nPlot successfully saved to: {os.path.abspath(filename)}")
 
 
+def commit_and_push_to_github(files_to_commit: list[str], commit_message: str):
+    """Stages, commits, and pushes specified files to GitHub using GITHUB_TOKEN env variable."""
+    try:
+        repo_path = os.getcwd()
+        repo = Repo(repo_path)
+
+        if repo.bare:
+            print("\n[Git Error] Repository path is bare or invalid.")
+            return
+
+        print("\n--- Staging and Committing Files ---")
+
+        # Stage files
+        repo.index.add(files_to_commit)
+        print(f"Staged files: {files_to_commit}")
+
+        # Commit changes
+        repo.index.commit(commit_message)
+        print(f"Committed with message: '{commit_message}'")
+
+        origin = repo.remote(name="origin")
+        original_url = list(origin.urls)[0]
+
+        # Retrieve token from environment variable
+        github_token = os.getenv("GITHUB_TOKEN")
+
+        if not github_token:
+            print(
+                "\n[Git Warning] GITHUB_TOKEN environment variable not set."
+            )
+            print("Attempting to push using existing local/default Git credentials...")
+            origin.push()
+            print("Successfully pushed changes to GitHub!")
+            return
+
+        modified_url = False
+        try:
+            # Inject token safely into HTTPS remote URL for this push operation
+            if original_url.startswith("https://"):
+                clean_url = original_url.split("@")[-1].replace("https://", "")
+                auth_url = f"https://x-access-token:{github_token}@{clean_url}"
+                origin.set_url(auth_url)
+                modified_url = True
+
+            print("Pushing changes to GitHub...")
+            origin.push()
+            print("Successfully pushed changes to GitHub!")
+
+        finally:
+            # Guarantee the token is restored so it is never left in .git/config on disk
+            if modified_url:
+                origin.set_url(original_url)
+
+    except GitCommandError as git_err:
+        print(f"\n[Git Command Error]: {git_err}")
+        print(
+            "Tip: Ensure your Personal Access Token has the 'repo' scope enabled."
+        )
+    except Exception as e:
+        print(f"\n[Git Automation Error]: {e}")
+
+
 def run_evolution():
     # 1. Interactive Text Entry Box (Terminal input)
-    user_input = input(f"Enter target phrase (Press ENTER for default '{DEFAULT_TARGET}'): ").strip().upper()
+    user_input = input(
+        f"Enter target phrase (Press ENTER for default '{DEFAULT_TARGET}'): "
+    ).strip().upper()
     target = user_input if user_input else DEFAULT_TARGET
 
-    # Restrict character set to uppercase and space for standard simulation matching
+    # Restrict character set to uppercase and space
     target = "".join(c if c in POSSIBLE_CHARS else " " for c in target)
     target_length = len(target)
 
@@ -66,6 +164,14 @@ def run_evolution():
     fitness_history = [best_score_so_far]
 
     log_file_path = "generations_log.txt"
+    plot_file_path = "fitness_over_time.png"
+
+    # Robust detection of current script path
+    script_file_path = (
+        os.path.basename(__file__)
+        if "__file__" in globals()
+        else os.path.basename(sys.argv[0])
+    )
 
     # 3. Main Evolutionary Loop & Logging
     with open(log_file_path, "w", encoding="utf-8") as log_file:
@@ -86,11 +192,14 @@ def run_evolution():
                 for _ in range(POPULATION_SIZE)
             ]
 
-            # Find best offspring in current pool
-            best_offspring = max(
-                offspring_pool, key=lambda child: calculate_fitness(child, target)
+            # Find best offspring and fitness in a single pass
+            best_offspring, best_offspring_fitness = max(
+                (
+                    (child, calculate_fitness(child, target))
+                    for child in offspring_pool
+                ),
+                key=lambda item: item[1],
             )
-            best_offspring_fitness = calculate_fitness(best_offspring, target)
 
             # Update state if better or equal
             if best_offspring_fitness >= best_score_so_far:
@@ -110,10 +219,18 @@ def run_evolution():
         print(summary_msg)
         log_file.write(summary_msg)
 
-    print(f"Full generation log saved to: {os.path.abspath(log_file_path)}")
+    # 4. Save Scatter Plot
+    plot_fitness(
+        generation_history, fitness_history, target_length, filename=plot_file_path
+    )
 
-    # 4. Save Fitness Plot
-    plot_fitness(generation_history, fitness_history, target_length)
+    # 5. Automatically Stage, Commit, and Push to GitHub
+    files_to_push = [plot_file_path, log_file_path]
+    if os.path.exists(script_file_path) and script_file_path:
+        files_to_push.append(script_file_path)
+
+    commit_msg = f"Auto-commit: Ran Weasel evolution for '{target}' (Generations: {generation})"
+    commit_and_push_to_github(files_to_push, commit_msg)
 
 
 if __name__ == "__main__":
