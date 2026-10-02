@@ -20,4 +20,6 @@ The CobberResidue codes walk through the importation of multiple datasets to com
 
 The ErrorMetrics code performs a similar task to CobberResidue, but uses NumPy to create arrays from which plots and the MAE, MSE, and R squared values are calculated from. 
 
+The code written in ElementsClustering and ElementClustering 2 provides the ability to import a csv file of group 1 and group 2 elements of the periodic table - inlcuding name, symbol, atomic number, atomic radius, and first ionization energy - and uses that data to create a scatterplot. There is a loop that allows the user to input a value for K and cluster the data.
+
 Alongside the assigned coding projects, I will be keeping a private ethics portfolio where I reflect on my learning and how it impacts the kind of scientists I am developing into. 
