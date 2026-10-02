@@ -22,4 +22,6 @@ The ErrorMetrics code performs a similar task to CobberResidue, but uses NumPy t
 
 The code written in ElementsClustering and ElementClustering 2 provides the ability to import a csv file of group 1 and group 2 elements of the periodic table - inlcuding name, symbol, atomic number, atomic radius, and first ionization energy - and uses that data to create a scatterplot. There is a loop that allows the user to input a value for K and cluster the data.
 
+The code written in Androgen Angonist Pipowski works to import 4 datasets into python and combine them into a master dataset which can exported as a .csv file for use. The purpose of the code is to work on our class's final project.
+
 Alongside the assigned coding projects, I will be keeping a private ethics portfolio where I reflect on my learning and how it impacts the kind of scientists I am developing into. 
