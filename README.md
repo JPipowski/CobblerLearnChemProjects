@@ -24,6 +24,8 @@ The code written in ElementsClustering and ElementClustering 2 provides the abil
 
 The code written in Gradient Descent is creating a noisy dataset using numpy, then generates a scatter plot and a fitted line and then generates a loss landscape visualization. 
 
+The METHINKS IT IS LIKE A WEASEL code directory creates code that is similar to the famed "The Weasel Program" and creates a string that can be modified to match the target phrase. It uses an evolution loop to develop the string and slightly modify it over time, scoring it and replacing the parent string if the string is better. In addition, there is a text box added to change the target phrase if desired. 
+
 The code written in Androgen Angonist Pipowski works to import 4 datasets into python and combine them into a master dataset which can exported as a .csv file for use. The purpose of the code is to work on our class's final project.
 
 Alongside the assigned coding projects, I will be keeping a private ethics portfolio where I reflect on my learning and how it impacts the kind of scientists I am developing into. 
