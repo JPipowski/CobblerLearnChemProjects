@@ -1,4 +1,4 @@
-import getpass
+
 import os
 import random
 import string
@@ -40,7 +40,7 @@ def mutate(parent: str, mutation_rate: float) -> str:
 
 def plot_fitness(
     generations: list[int],
-    fitnesses: list[int],
+    fitness: list[int],
     target_len: int,
     filename: str = "fitness_over_time.png",
 ):
@@ -49,7 +49,7 @@ def plot_fitness(
 
     plt.scatter(
         generations,
-        fitnesses,
+        fitness,
         color="#e74c3c",
         alpha=0.7,
         edgecolors="none",
@@ -57,7 +57,7 @@ def plot_fitness(
     )
     plt.plot(
         generations,
-        fitnesses,
+        fitness,
         color="#2b5c8f",
         linestyle="--",
         linewidth=1.5,
@@ -167,7 +167,7 @@ def run_evolution():
     plot_file_path = "fitness_over_time.png"
 
     # Robust detection of current script path
-    script_file_path = (
+    script_file_path: str | bytes = (
         os.path.basename(__file__)
         if "__file__" in globals()
         else os.path.basename(sys.argv[0])
