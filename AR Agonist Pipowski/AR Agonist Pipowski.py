@@ -51,7 +51,7 @@ for next_df in merged_dataframes[1:]:
         master_df, next_df.drop(columns=cols_to_drop), on='DTXSID', how='outer'
     )
 
-# 4. Export combined master CSV with requested filename
+# 4. Export combined master CSV
 output_filename = 'Master_Agonist_Dataset.csv'
 master_df.to_csv(output_filename, index=False)
 
@@ -79,7 +79,33 @@ for assay_name, df in dfs.items():
     print(summary_df)
 
 print('\n==================================================')
-print('3. NUMERICAL VARIABLE SUMMARIES (BY ASSAY)')
+print('3. CROSS-ASSAY ACTIVE CHEMICAL SUMMARY')
+print('==================================================')
+hit_cols = [col for col in master_df.columns if col.endswith('_HIT CALL')]
+
+# Count how many assays each chemical was active in
+active_matrix = master_df[hit_cols] == 'Active'
+active_counts = active_matrix.sum(axis=1)
+
+print(
+    f'Chemicals Active across ALL 4 Assays: {(active_counts == 4).sum():,} ({((active_counts == 4).sum() / len(master_df)) * 100:.2f}%)'
+)
+print(
+    f'Chemicals Active in AT LEAST 1 Assay: {(active_counts >= 1).sum():,} ({((active_counts >= 1).sum() / len(master_df)) * 100:.2f}%)'
+)
+
+print('\nDetailed Breakdown (Active Assay Count per Chemical):')
+breakdown_df = pd.DataFrame({
+    'Active Assays': active_counts.value_counts().sort_index().index,
+    'Chemical Count': active_counts.value_counts().sort_index().values,
+    'Percentage (%)': (
+        active_counts.value_counts(normalize=True).sort_index().values * 100
+    ).round(2),
+})
+print(breakdown_df.to_string(index=False))
+
+print('\n==================================================')
+print('4. NUMERICAL VARIABLE SUMMARIES (BY ASSAY)')
 print('==================================================')
 for assay_name, df in dfs.items():
     print(f'\n--- Numerical Summary: {assay_name} ---')
