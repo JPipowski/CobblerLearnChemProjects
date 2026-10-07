@@ -51,17 +51,18 @@ for next_df in merged_dataframes[1:]:
         master_df, next_df.drop(columns=cols_to_drop), on='DTXSID', how='outer'
     )
 
-# Export combined master CSV
-master_df.to_csv('Master_Assay_Dataset_Combined.csv', index=False)
+# 4. Export combined master CSV with requested filename
+output_filename = 'Master_Agonist_Dataset.csv'
+master_df.to_csv(output_filename, index=False)
 
-# 4. Reporting Section
+# 5. Reporting Section
 print('==================================================')
 print('1. CHEMICAL COUNTS')
 print('==================================================')
 for assay_name, df in dfs.items():
     print(f'{assay_name}: {df["DTXSID"].nunique():,} unique chemicals')
 print(
-    f'\nCombined Master Dataset: {master_df["DTXSID"].nunique():,} total unique chemicals'
+    f'\nCombined Master Dataset ({output_filename}): {master_df["DTXSID"].nunique():,} total unique chemicals'
 )
 
 print('\n==================================================')
