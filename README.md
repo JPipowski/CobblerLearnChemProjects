@@ -28,7 +28,7 @@ The METHINKS IT IS LIKE A WEASEL code directory creates code that is similar to 
 
 The code written in Androgen Angonist Pipowski works to import 4 datasets into python and combine them into a master dataset which can exported as a .csv file for use. The purpose of the code is to work on our class's final project. 
 
-The code written in AR Agonist Pipowski_2 takes a LUC Assay and LUC Viability Assay and combines them into a master dataset named "LUC_Master_Dataset." For each column in the dataset, I will explain what they represent below. 
+The code written in AR Agonist Pipowski_2 takes a LUC Assay and LUC Viability Assay and combines them into a master dataset named "LUC_Master_Dataset." The LUC Assay tests for luciferase report gene activity via bioluminescence signals. The Viability Assay uses the LUC Assay and uses the Nilutamide viability to look for loss-of-function to understand changes in cell viability. For each column in the dataset, I will explain what they represent below. 
   - DTXSID: The unique id code given by CompTox to each chemical, used to organize each assay by chemical.
   - Preferred Name: This column is simply the name of the chemical.
   - CASRN: This column is the Chemical Abstracts Service Registry Number, which is unique identifier that links the chemical to its chemical structure data, its bioactivity, and regulatory information.
@@ -37,7 +37,7 @@ The code written in AR Agonist Pipowski_2 takes a LUC Assay and LUC Viability As
   - TOXCAST ACTIVE_Agonist: This column showcases the total number of ToxCast Endpoints where the sample is considered active in the LUC_Agonist assay.
   - TOXCAST_TOTAL_Agonist: This column represents the total number of Toxcast endpoints where the chemical was screened.
   - % TOXCAST ACTIVE_Agonist: This column is the percentage of active samples across all ToxCast endpoints where it was screened.
-  - HIT CALL_Agonist: This column tells us if the LUC Assay determined the chemical in question to be active or inactive.
+  - HIT CALL_Agonist: This column tells us if the LUC Assay determined the chemical in question to be active or inactive. If active, the 
   - CONTINUOUS HIT CALL_Agonist: This column showcases if the chemical, if active, reacted in the intended response. A negative value means it reacted in an unexpected way.
   - TOP_Agonist: This column is a value that represents the best model where maximum response was observed relative to the control.
   - SCALED TOP_Agonist: This column is a value that is calcualted by dividing response values by the activity cutoff, which allows for response comparisons across different assay endpoints.
@@ -46,7 +46,7 @@ The code written in AR Agonist Pipowski_2 takes a LUC Assay and LUC Viability As
   - TOXCAST ACTIVE_Viability: This column represents the number of ToxCast Endpoints where the sample is considered Active in the Viability assay.
   - TOXCAST TOTAL_Viabilty: This comun represents the total number of ToxCast endpoints where the chemical was screened.
   - % TOXCAST ACTIVE_Viability: This column is the percentage of active samples across all ToxCast Endpoints where the chemical was screened.
-  - HIT CALL_Viability: This is the column that tells us if the chemical was active or inactive for the Viability Assay.
+  - HIT CALL_Viability: This is the column that tells us if the chemical was active or inactive for the Viability Assay. If active, the cell is alive and metabolically active. If inactive, the cell is dead. 
   - CONTINUOUS HIT CALL_Viabilty: This column represents if an actives chemcial reacted in the expected response. A negative value means the chemical reacted in an unexpected way.
   - TOP_Viability: This column is a value that represents the best model where maximum response was observed relative to the control.
   - SCALED TOP_Viability: This column is a value that is calculated by dividing response values by the activity cutoff, which allows for response comparisons across different Assay Endpoints.
