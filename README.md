@@ -26,6 +26,31 @@ The code written in Gradient Descent is creating a noisy dataset using numpy, th
 
 The METHINKS IT IS LIKE A WEASEL code directory creates code that is similar to the famed "The Weasel Program" and creates a string that can be modified to match the target phrase. It uses an evolution loop to develop the string and slightly modify it over time, scoring it and replacing the parent string if the string is better. In addition, there is a text box added to change the target phrase if desired. 
 
-The code written in Androgen Angonist Pipowski works to import 4 datasets into python and combine them into a master dataset which can exported as a .csv file for use. The purpose of the code is to work on our class's final project.
+The code written in Androgen Angonist Pipowski works to import 4 datasets into python and combine them into a master dataset which can exported as a .csv file for use. The purpose of the code is to work on our class's final project. 
+
+The code written in AR Agonist Pipowski_2 takes a LUC Assay and LUC Viability Assay and combines them into a master dataset named "LUC_Master_Dataset." For each column in the dataset, I will explain what they represent below. 
+  - DTXSID: The unique id code given by CompTox to each chemical, used to organize each assay by chemical.
+  - Preferred Name: This column is simply the name of the chemical.
+  - CASRN: This column is the Chemical Abstracts Service Registry Number, which is unique identifier that links the chemical to its chemical structure data, its bioactivity, and regulatory information.
+  - Molecular Formula: This is the molecular formula of the molecule, but NOT a smiles string.
+  - Monoisotopic Mass: This column showcases the average mass of the chemical by averaging all known isotopes of the constitute elements.
+  - TOXCAST ACTIVE_Agonist: This column showcases the total number of ToxCast Endpoints where the sample is considered active in the LUC_Agonist assay.
+  - TOXCAST_TOTAL_Agonist: This column represents the total number of Toxcast endpoints where the chemical was screened.
+  - % TOXCAST ACTIVE_Agonist: This column is the percentage of active samples across all ToxCast endpoints where it was screened.
+  - HIT CALL_Agonist: This column tells us if the LUC Assay determined the chemical in question to be active or inactive.
+  - CONTINUOUS HIT CALL_Agonist: This column showcases if the chemical, if active, reacted in the intended response. A negative value means it reacted in an unexpected way.
+  - TOP_Agonist: This column is a value that represents the best model where maximum response was observed relative to the control.
+  - SCALED TOP_Agonist: This column is a value that is calcualted by dividing response values by the activity cutoff, which allows for response comparisons across different assay endpoints.
+  - AC50_Agonist: This column represents the activity concentration at 50% of maximal activity. A lower value indiciates that a chemcial is more potent and a lower concentration is needed to achieve half of the maximum observed response in the Assay.
+  - LOGAC50_Agonist: This column is the linearization of the AC50 for the purpose of regression calculations and comparisons.
+  - TOXCAST ACTIVE_Viability: This column represents the number of ToxCast Endpoints where the sample is considered Active in the Viability assay.
+  - TOXCAST TOTAL_Viabilty: This comun represents the total number of ToxCast endpoints where the chemical was screened.
+  - % TOXCAST ACTIVE_Viability: This column is the percentage of active samples across all ToxCast Endpoints where the chemical was screened.
+  - HIT CALL_Viability: This is the column that tells us if the chemical was active or inactive for the Viability Assay.
+  - CONTINUOUS HIT CALL_Viabilty: This column represents if an actives chemcial reacted in the expected response. A negative value means the chemical reacted in an unexpected way.
+  - TOP_Viability: This column is a value that represents the best model where maximum response was observed relative to the control.
+  - SCALED TOP_Viability: This column is a value that is calculated by dividing response values by the activity cutoff, which allows for response comparisons across different Assay Endpoints.
+  - AC50_Viability: This column represents the activity concentration at 50% of the maximal activity. A lower value indicates that a chemical is more potent and a lower concentration is needed to achieve hald of the maximum observed response in the Assay.
+  - LOGAC50_Viabilty: This column is the linearization of the AC50 for the purpose of regression calculations and comparisons. 
 
 Alongside the assigned coding projects, I will be keeping a private ethics portfolio where I reflect on my learning and how it impacts the kind of scientists I am developing into. 
