@@ -103,10 +103,10 @@ print(
 
 
 # ---------------------------------------------------------
-# Part 4: Assay Summary and Dual-Active Reporting
+# Part 4: Assay Summary, Missing Data, and Dual-Active Reporting
 # ---------------------------------------------------------
 print("\n" + "=" * 60)
-print(" TOX21 ASSAY ENDPOINT & DUAL-ACTIVE SUMMARY REPORT")
+print(" TOX21 ASSAY ENDPOINT & QUALITY CONTROL SUMMARY REPORT")
 print("=" * 60)
 
 total_chemicals = len(luc_master_strings)
@@ -135,6 +135,27 @@ report_endpoint_stats(
     "HIT CALL_Viability",
     "Nilutamide Viability Assay (HIT CALL)",
 )
+
+# --- Missing Data Report per Column ---
+print("\n" + "-" * 60)
+print(" MISSING DATA REPORT (Per Column Counts & Percentages)")
+print("-" * 60)
+
+missing_counts = luc_master_strings.isnull().sum()
+missing_percentages = (missing_counts / total_chemicals) * 100
+
+missing_summary = pd.DataFrame({
+    "Missing Count": missing_counts,
+    "Missing Percentage (%)": missing_percentages,
+})
+
+# Filter to show only columns that have at least one missing value
+missing_summary_filtered = missing_summary[missing_summary["Missing Count"] > 0]
+
+if not missing_summary_filtered.empty:
+  print(missing_summary_filtered.round(2).to_string())
+else:
+  print("No missing data found across any columns!")
 
 # Find and report chemicals active in BOTH assays
 print("\n" + "-" * 60)
