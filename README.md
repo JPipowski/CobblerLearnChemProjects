@@ -53,6 +53,7 @@ The code written in AR Agonist Pipowski_2 takes a LUC Assay and LUC Viability As
   - AC50_Viability: This column represents the activity concentration at 50% of the maximal activity. A lower value indicates that a chemical is more potent and a lower concentration is needed to achieve hald of the maximum observed response in the Assay.
   - LOGAC50_Viabilty: This column is the linearization of the AC50 for the purpose of regression calculations and comparisons.
   - SMILES: This column showcases the SMILES string for each chemical.
-  - MORGAN_FP: This column is the Morgan Fingerprint of each chemical. 
+  - MORGAN_FP: This column is the Morgan Fingerprint of each chemical.
+The code also generates a missing data report for each column in counts and percentages. In addition, it gives a data report on the chemical counts, the amount of active and inactive chemicals, and how many chemicals are active across both assays. 
 
 Alongside the assigned coding projects, I will be keeping a private ethics portfolio where I reflect on my learning and how it impacts the kind of scientists I am developing into. 
