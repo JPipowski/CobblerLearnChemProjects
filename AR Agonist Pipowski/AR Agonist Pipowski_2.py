@@ -1,4 +1,6 @@
 import pandas as pd
+from rdkit import Chem
+from rdkit.Chem import rdFingerprintGenerator
 
 # ---------------------------------------------------------
 # Part 1: Create the Master Dataset from the 2 Tox21 Files
@@ -45,7 +47,6 @@ LUC_Master_dataset = pd.merge(
 LUC_Master_dataset.to_csv("LUC_Master_dataset.csv", index=False)
 print(f"Created LUC_Master_dataset with shape: {LUC_Master_dataset.shape}")
 
-
 # ---------------------------------------------------------
 # Part 2: Merge SMILES Strings to create LUC_Master_Strings
 # ---------------------------------------------------------
@@ -60,9 +61,40 @@ luc_master_strings = pd.merge(
     LUC_Master_dataset, df_smiles, on="DTXSID", how="left"
 )
 
-# Export the final combined master dataset
-output_filename = "LUC_Master_Strings.csv"
-luc_master_strings.to_csv(output_filename, index=False)
-print(
-    f"Successfully created '{output_filename}' with shape: {luc_master_strings.shape}"
+# Export the combined master dataset with SMILES
+luc_master_strings.to_csv("LUC_Master_Strings.csv", index=False)
+print(f"Created 'LUC_Master_Strings.csv' with shape: {luc_master_strings.shape}")
+
+# ---------------------------------------------------------
+# Part 3: Generate Molecular Fingerprints via MorganGenerator
+# ---------------------------------------------------------
+print("Generating Morgan fingerprints using MorganGenerator (Radius=2, 2048 bits)...")
+
+# Initialize the modern RDKit Morgan fingerprint generator
+# useCountSimulation=False ensures standard binary bit-vector representation equivalent to legacy methods
+mfpgen = rdFingerprintGenerator.GetMorganGenerator(
+    radius=2, fpSize=2048, useCountSimulation=False
 )
+
+
+def compute_morgan_fingerprint(smiles):
+    """Computes Morgan fingerprint bit vector from a SMILES string using MorganGenerator."""
+    if pd.isna(smiles) or not isinstance(smiles, str) or not smiles.strip():
+        return None
+    mol = Chem.MolFromSmiles(smiles)
+    if mol is None:
+        return None  # Invalid SMILES string
+
+    fp = mfpgen.GetFingerprint(mol)
+    # Convert explicit bit vector to a list of integers (0s and 1s)
+    return list(fp)
+
+
+# Apply fingerprint generation to each row based on the SMILES column
+luc_master_strings["Morgan_FP"] = luc_master_strings["SMILES"].apply(compute_morgan_fingerprint)
+
+# Export the final enhanced dataset
+final_output = "LUC_Master_With_Fingerprints.csv"
+luc_master_strings.to_csv(final_output, index=False)
+
+print(f"Successfully created '{final_output}' with shape: {luc_master_strings.shape}")
