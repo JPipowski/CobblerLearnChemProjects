@@ -28,7 +28,7 @@ The METHINKS IT IS LIKE A WEASEL code directory creates code that is similar to 
 
 The code written in Androgen Angonist Pipowski works to import 4 datasets into python and combine them into a master dataset which can exported as a .csv file for use. The purpose of the code is to work on our class's final project. 
 
-The code written in AR Agonist Pipowski_2 takes a LUC Assay and LUC Viability Assay and combines them into a master dataset named "LUC_Master_Dataset." The LUC Assay tests for luciferase report gene activity via bioluminescence signals. The Viability Assay uses the LUC Assay and uses the Nilutamide viability to look for loss-of-function to understand changes in cell viability. For each column in the dataset, I will explain what they represent below. 
+The code written in AR Agonist Pipowski_2 takes a LUC Assay and LUC Viability Assay and combines them into a master dataset named "LUC_Master_Dataset." The LUC Assay tests for luciferase report gene activity via bioluminescence signals. The Viability Assay uses the LUC Assay and uses the Nilutamide viability to look for loss-of-function to understand changes in cell viability. The Batch Dataset contains the SMILES string for each chemical and it merges with the "LUC_Master_Dataset" to create the "LUC_Master_Strings." Finally, the code generates the Morgan Binary Fingerprint for each chemical and creates a final dataset that merges into the "LUC_Master_With_Fingerprints." For each column in the dataset, I will explain what they represent below. 
   - DTXSID: The unique id code given by CompTox to each chemical, used to organize each assay by chemical.
   - Preferred Name: This column is simply the name of the chemical.
   - CASRN: This column is the Chemical Abstracts Service Registry Number, which is unique identifier that links the chemical to its chemical structure data, its bioactivity, and regulatory information.
@@ -51,6 +51,8 @@ The code written in AR Agonist Pipowski_2 takes a LUC Assay and LUC Viability As
   - TOP_Viability: This column is a value that represents the best model where maximum response was observed relative to the control.
   - SCALED TOP_Viability: This column is a value that is calculated by dividing response values by the activity cutoff, which allows for response comparisons across different Assay Endpoints.
   - AC50_Viability: This column represents the activity concentration at 50% of the maximal activity. A lower value indicates that a chemical is more potent and a lower concentration is needed to achieve hald of the maximum observed response in the Assay.
-  - LOGAC50_Viabilty: This column is the linearization of the AC50 for the purpose of regression calculations and comparisons. 
+  - LOGAC50_Viabilty: This column is the linearization of the AC50 for the purpose of regression calculations and comparisons.
+  - SMILES: This column showcases the SMILES string for each chemical.
+  - MORGAN_FP: This column is the Morgan Fingerprint of each chemical. 
 
 Alongside the assigned coding projects, I will be keeping a private ethics portfolio where I reflect on my learning and how it impacts the kind of scientists I am developing into. 
