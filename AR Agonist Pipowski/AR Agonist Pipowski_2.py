@@ -47,6 +47,7 @@ LUC_Master_dataset = pd.merge(
 LUC_Master_dataset.to_csv("LUC_Master_dataset.csv", index=False)
 print(f"Created LUC_Master_dataset with shape: {LUC_Master_dataset.shape}")
 
+
 # ---------------------------------------------------------
 # Part 2: Merge SMILES Strings to create LUC_Master_Strings
 # ---------------------------------------------------------
@@ -65,36 +66,95 @@ luc_master_strings = pd.merge(
 luc_master_strings.to_csv("LUC_Master_Strings.csv", index=False)
 print(f"Created 'LUC_Master_Strings.csv' with shape: {luc_master_strings.shape}")
 
+
 # ---------------------------------------------------------
 # Part 3: Generate Molecular Fingerprints via MorganGenerator
 # ---------------------------------------------------------
 print("Generating Morgan fingerprints using MorganGenerator (Radius=2, 2048 bits)...")
 
-# Initialize the modern RDKit Morgan fingerprint generator
-# useCountSimulation=False ensures standard binary bit-vector representation equivalent to legacy methods
-mfpgen = rdFingerprintGenerator.GetMorganGenerator(
-    radius=2, fpSize=2048, useCountSimulation=False
-)
+# Initialize the modern RDKit Morgan fingerprint generator safely
+mfpgen = rdFingerprintGenerator.GetMorganGenerator(radius=2, fpSize=2048)
 
 
 def compute_morgan_fingerprint(smiles):
-    """Computes Morgan fingerprint bit vector from a SMILES string using MorganGenerator."""
-    if pd.isna(smiles) or not isinstance(smiles, str) or not smiles.strip():
-        return None
-    mol = Chem.MolFromSmiles(smiles)
-    if mol is None:
-        return None  # Invalid SMILES string
+  """Computes Morgan fingerprint bit vector from a SMILES string using MorganGenerator."""
+  if pd.isna(smiles) or not isinstance(smiles, str) or not smiles.strip():
+    return None
+  mol = Chem.MolFromSmiles(smiles)
+  if mol is None:
+    return None  # Invalid SMILES string
 
-    fp = mfpgen.GetFingerprint(mol)
-    # Convert explicit bit vector to a list of integers (0s and 1s)
-    return list(fp)
+  fp = mfpgen.GetFingerprint(mol)
+  return list(fp)
 
 
 # Apply fingerprint generation to each row based on the SMILES column
-luc_master_strings["Morgan_FP"] = luc_master_strings["SMILES"].apply(compute_morgan_fingerprint)
+luc_master_strings["Morgan_FP"] = luc_master_strings["SMILES"].apply(
+    compute_morgan_fingerprint
+)
 
-# Export the final enhanced dataset
+# Export the enhanced dataset with fingerprints
 final_output = "LUC_Master_With_Fingerprints.csv"
 luc_master_strings.to_csv(final_output, index=False)
+print(
+    f"Successfully created '{final_output}' with shape:"
+    f" {luc_master_strings.shape}"
+)
 
-print(f"Successfully created '{final_output}' with shape: {luc_master_strings.shape}")
+
+# ---------------------------------------------------------
+# Part 4: Assay Summary and Dual-Active Reporting
+# ---------------------------------------------------------
+print("\n" + "=" * 60)
+print(" TOX21 ASSAY ENDPOINT & DUAL-ACTIVE SUMMARY REPORT")
+print("=" * 60)
+
+total_chemicals = len(luc_master_strings)
+print(f"Total Unique Chemicals in Dataset: {total_chemicals}")
+
+
+def report_endpoint_stats(df, col_name, endpoint_label):
+  print(f"\n--- {endpoint_label} ---")
+  if col_name not in df.columns:
+    print(f"Column '{col_name}' not found in dataset.")
+    return
+
+  counts = df[col_name].value_counts(dropna=False)
+  percentages = df[col_name].value_counts(normalize=True, dropna=False) * 100
+
+  summary_df = pd.DataFrame({"Count": counts, "Percentage (%)": percentages})
+  print(summary_df.round(2).to_string())
+
+
+# Report stats for individual assays
+report_endpoint_stats(
+    luc_master_strings, "HIT CALL_Agonist", "AR Agonist Assay (HIT CALL)"
+)
+report_endpoint_stats(
+    luc_master_strings,
+    "HIT CALL_Viability",
+    "Nilutamide Viability Assay (HIT CALL)",
+)
+
+# Find and report chemicals active in BOTH assays
+print("\n" + "-" * 60)
+print(" DUAL-ACTIVE CHEMICALS (Active in Both Agonist & Viability)")
+print("-" * 60)
+
+dual_active_df = luc_master_strings[
+    (luc_master_strings["HIT CALL_Agonist"] == "Active")
+    & (luc_master_strings["HIT CALL_Viability"] == "Active")
+]
+
+print(f"Total chemicals active in both assays: {len(dual_active_df)}")
+
+if not dual_active_df.empty:
+  print("\nPreview of Dual-Active Chemicals:")
+  preview_cols = ["PREFERRED NAME", "CASRN", "DTXSID", "AC50_Agonist", "AC50_Viability"]
+  print(dual_active_df[preview_cols].to_string(index=False))
+
+  # Export dual-active subset to a separate CSV
+  dual_active_df.to_csv("LUC_Dual_Active_Chemicals.csv", index=False)
+  print("\nSaved full list of dual-active chemicals to 'LUC_Dual_Active_Chemicals.csv'")
+
+print("=" * 60)
