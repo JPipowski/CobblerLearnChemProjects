@@ -1,181 +1,79 @@
+import numpy as np
 import pandas as pd
 from rdkit import Chem
 from rdkit.Chem import rdFingerprintGenerator
 
 # ---------------------------------------------------------
-# Part 1: Create the Master Dataset from the 2 Tox21 Files
+# Part 0: Override Pandas Display Limits
 # ---------------------------------------------------------
-file_agonist = "Assay List TOX21_AR_LUC_MDAKB2_Agonist-2026-10-09.csv"
-file_viability = "Assay List TOX21_AR_LUC_MDAKB2_Agonist_3uM_Nilutamide_viability-2026-10-06.csv"
+# This ensures Pandas won't truncate rows or columns when printing
+pd.set_option("display.max_rows", 10000)
+pd.set_option("display.max_columns", 50)
+pd.set_option("display.width", 1000)
 
-df_agonist = pd.read_csv(file_agonist)
-df_viability = pd.read_csv(file_viability)
+# ---------------------------------------------------------
+# Part 1: Load Datasets
+# ---------------------------------------------------------
+file_master = "LUC_Master_dataset.csv"
+file_ccd = "CCD-Batch-Search_2026-10-16_05_15_34.csv"
 
-metadata_cols = [
-    "DTXSID",
-    "PREFERRED NAME",
-    "CASRN",
-    "MOLECULAR FORMULA",
-    "MONOISOTOPIC MASS",
-]
-readout_cols = [
-    "TOXCAST ACTIVE",
-    "TOXCAST TOTAL",
-    "% TOXCAST ACTIVE",
-    "HIT CALL",
-    "CONTINUOUS HIT CALL",
-    "TOP",
-    "SCALED TOP",
-    "AC50",
-    "LOGAC50",
-]
+luc_df = pd.read_csv(file_master)
+ccd_df = pd.read_csv(file_ccd)
 
-# Rename assay readout columns with specific suffixes to avoid column collision
-df_ag_prep = df_agonist.rename(
-    columns={col: f"{col}_Agonist" for col in readout_cols}
+# ---------------------------------------------------------
+# Part 2: Normalize DTXSID & Merge SMILES Data
+# ---------------------------------------------------------
+luc_df["normalized_DTXSID"] = luc_df["DTXSID"].apply(
+    lambda x: x.split("/")[-1] if isinstance(x, str) else x
 )
-df_vi_prep = df_viability.rename(
-    columns={col: f"{col}_Viability" for col in readout_cols}
+ccd_df["normalized_DTXSID"] = ccd_df["DTXSID"].apply(
+    lambda x: x.split("/")[-1] if isinstance(x, str) else x
 )
 
-# Combine into master dataset using DTXSID and shared chemical metadata
-LUC_Master_dataset = pd.merge(
-    df_ag_prep, df_vi_prep, on=metadata_cols, how="outer"
+merged_df = pd.merge(
+    luc_df,
+    ccd_df[["normalized_DTXSID", "SMILES", "QSAR_READY_SMILES"]],
+    on="normalized_DTXSID",
+    how="left",
+).drop(columns=["normalized_DTXSID"])
+
+
+# ---------------------------------------------------------
+# Part 3: Generate Radius 3 Morgan Fingerprints (Modern API)
+# ---------------------------------------------------------
+# Initialize modern RDKit Morgan fingerprint generator (Radius 3, 2048 bits)
+morgan_generator = rdFingerprintGenerator.GetMorganGenerator(
+    radius=3, fpSize=2048
 )
 
-# Export intermediate master dataset
-LUC_Master_dataset.to_csv("LUC_Master_dataset.csv", index=False)
-print(f"Created LUC_Master_dataset with shape: {LUC_Master_dataset.shape}")
 
+def get_morgan_fingerprint(smiles):
+  """Generates a Morgan fingerprint bit vector (Radius 3, ECFP6-equivalent)
 
-# ---------------------------------------------------------
-# Part 2: Merge SMILES Strings to create LUC_Master_Strings
-# ---------------------------------------------------------
-batch_file = "Batch-Search-chemical-list-2026-10-11.csv"
-df_batch = pd.read_csv(batch_file)
-
-# Extract relevant columns from the batch file
-df_smiles = df_batch[["DTXSID", "SMILES"]]
-
-# Merge the SMILES strings into the master dataset
-luc_master_strings = pd.merge(
-    LUC_Master_dataset, df_smiles, on="DTXSID", how="left"
-)
-
-# Export the combined master dataset with SMILES
-luc_master_strings.to_csv("LUC_Master_Strings.csv", index=False)
-print(f"Created 'LUC_Master_Strings.csv' with shape: {luc_master_strings.shape}")
-
-
-# ---------------------------------------------------------
-# Part 3: Generate Molecular Fingerprints via MorganGenerator
-# ---------------------------------------------------------
-print("Generating Morgan fingerprints using MorganGenerator (Radius=2, 2048 bits)...")
-
-# Initialize the modern RDKit Morgan fingerprint generator safely
-mfpgen = rdFingerprintGenerator.GetMorganGenerator(radius=2, fpSize=2048)
-
-
-def compute_morgan_fingerprint(smiles):
-  """Computes Morgan fingerprint bit vector from a SMILES string using MorganGenerator."""
-  if pd.isna(smiles) or not isinstance(smiles, str) or not smiles.strip():
+  as a list of integers (0/1) from a QSAR-ready SMILES string using RDKit.
+  """
+  if pd.isna(smiles):
     return None
-  mol = Chem.MolFromSmiles(smiles)
-  if mol is None:
-    return None  # Invalid SMILES string
+  try:
+    mol = Chem.MolFromSmiles(str(smiles))
+    if mol is not None:
+      fp = morgan_generator.GetFingerprint(mol)
+      return list(fp)
+  except Exception:
+    pass
+  return None
 
-  fp = mfpgen.GetFingerprint(mol)
-  return list(fp)
 
-
-# Apply fingerprint generation to each row based on the SMILES column
-luc_master_strings["Morgan_FP"] = luc_master_strings["SMILES"].apply(
-    compute_morgan_fingerprint
+print("Generating Radius 3 Morgan fingerprints from QSAR_READY_SMILES...")
+merged_df["MORGAN_FP_R3"] = merged_df["QSAR_READY_SMILES"].apply(
+    get_morgan_fingerprint
 )
 
-# Export the enhanced dataset with fingerprints
-final_output = "LUC_Master_With_Fingerprints.csv"
-luc_master_strings.to_csv(final_output, index=False)
+# Export the updated master dataset
+output_filename = "LUC_Master_dataset_with_morgan_fps_r3.csv"
+merged_df.to_csv(output_filename, index=False)
+print(f"Successfully created '{output_filename}' with shape: {merged_df.shape}")
 print(
-    f"Successfully created '{final_output}' with shape:"
-    f" {luc_master_strings.shape}"
+    f"Total valid fingerprints generated:"
+    f" {merged_df['MORGAN_FP_R3'].notna().sum()}"
 )
-
-
-# ---------------------------------------------------------
-# Part 4: Assay Summary, Missing Data, and Dual-Active Reporting
-# ---------------------------------------------------------
-print("\n" + "=" * 60)
-print(" TOX21 ASSAY ENDPOINT & QUALITY CONTROL SUMMARY REPORT")
-print("=" * 60)
-
-total_chemicals = len(luc_master_strings)
-print(f"Total Unique Chemicals in Dataset: {total_chemicals}")
-
-
-def report_endpoint_stats(df, col_name, endpoint_label):
-  print(f"\n--- {endpoint_label} ---")
-  if col_name not in df.columns:
-    print(f"Column '{col_name}' not found in dataset.")
-    return
-
-  counts = df[col_name].value_counts(dropna=False)
-  percentages = df[col_name].value_counts(normalize=True, dropna=False) * 100
-
-  summary_df = pd.DataFrame({"Count": counts, "Percentage (%)": percentages})
-  print(summary_df.round(2).to_string())
-
-
-# Report stats for individual assays
-report_endpoint_stats(
-    luc_master_strings, "HIT CALL_Agonist", "AR Agonist Assay (HIT CALL)"
-)
-report_endpoint_stats(
-    luc_master_strings,
-    "HIT CALL_Viability",
-    "Nilutamide Viability Assay (HIT CALL)",
-)
-
-# --- Missing Data Report per Column ---
-print("\n" + "-" * 60)
-print(" MISSING DATA REPORT (Per Column Counts & Percentages)")
-print("-" * 60)
-
-missing_counts = luc_master_strings.isnull().sum()
-missing_percentages = (missing_counts / total_chemicals) * 100
-
-missing_summary = pd.DataFrame({
-    "Missing Count": missing_counts,
-    "Missing Percentage (%)": missing_percentages,
-})
-
-# Filter to show only columns that have at least one missing value
-missing_summary_filtered = missing_summary[missing_summary["Missing Count"] > 0]
-
-if not missing_summary_filtered.empty:
-  print(missing_summary_filtered.round(2).to_string())
-else:
-  print("No missing data found across any columns!")
-
-# Find and report chemicals active in BOTH assays
-print("\n" + "-" * 60)
-print(" DUAL-ACTIVE CHEMICALS (Active in Both Agonist & Viability)")
-print("-" * 60)
-
-dual_active_df = luc_master_strings[
-    (luc_master_strings["HIT CALL_Agonist"] == "Active")
-    & (luc_master_strings["HIT CALL_Viability"] == "Active")
-]
-
-print(f"Total chemicals active in both assays: {len(dual_active_df)}")
-
-if not dual_active_df.empty:
-  print("\nPreview of Dual-Active Chemicals:")
-  preview_cols = ["PREFERRED NAME", "CASRN", "DTXSID", "AC50_Agonist", "AC50_Viability"]
-  print(dual_active_df[preview_cols].to_string(index=False))
-
-  # Export dual-active subset to a separate CSV
-  dual_active_df.to_csv("LUC_Dual_Active_Chemicals.csv", index=False)
-  print("\nSaved full list of dual-active chemicals to 'LUC_Dual_Active_Chemicals.csv'")
-
-print("=" * 60)
