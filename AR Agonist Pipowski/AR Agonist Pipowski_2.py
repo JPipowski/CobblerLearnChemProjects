@@ -4,14 +4,6 @@ from rdkit import Chem
 from rdkit.Chem import rdFingerprintGenerator
 
 # ---------------------------------------------------------
-# Part 0: Override Pandas Display Limits
-# ---------------------------------------------------------
-# This ensures Pandas won't truncate rows or columns when printing
-pd.set_option("display.max_rows", 10000)
-pd.set_option("display.max_columns", 50)
-pd.set_option("display.width", 1000)
-
-# ---------------------------------------------------------
 # Part 1: Load Datasets
 # ---------------------------------------------------------
 file_master = "LUC_Master_dataset.csv"
@@ -39,7 +31,7 @@ merged_df = pd.merge(
 
 
 # ---------------------------------------------------------
-# Part 3: Generate Radius 3 Morgan Fingerprints (Modern API)
+# Part 3: Generate Radius 3 Morgan Fingerprints (Single Column)
 # ---------------------------------------------------------
 # Initialize modern RDKit Morgan fingerprint generator (Radius 3, 2048 bits)
 morgan_generator = rdFingerprintGenerator.GetMorganGenerator(
@@ -64,14 +56,17 @@ def get_morgan_fingerprint(smiles):
   return None
 
 
-print("Generating Radius 3 Morgan fingerprints from QSAR_READY_SMILES...")
+print("Generating Radius 3 Morgan fingerprints...")
 merged_df["MORGAN_FP_R3"] = merged_df["QSAR_READY_SMILES"].apply(
     get_morgan_fingerprint
 )
 
-# Export the updated master dataset
+# ---------------------------------------------------------
+# Part 4: Export Compact Dataset
+# ---------------------------------------------------------
 output_filename = "LUC_Master_dataset_with_morgan_fps_r3.csv"
 merged_df.to_csv(output_filename, index=False)
+
 print(f"Successfully created '{output_filename}' with shape: {merged_df.shape}")
 print(
     f"Total valid fingerprints generated:"
