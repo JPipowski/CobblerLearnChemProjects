@@ -31,44 +31,54 @@ merged_df = pd.merge(
 
 
 # ---------------------------------------------------------
-# Part 3: Generate Radius 3 Morgan Fingerprints (Single Column)
+# Part 3: Generate Radius 3 Morgan Fingerprints
 # ---------------------------------------------------------
-# Initialize modern RDKit Morgan fingerprint generator (Radius 3, 2048 bits)
 morgan_generator = rdFingerprintGenerator.GetMorganGenerator(
     radius=3, fpSize=2048
 )
 
 
-def get_morgan_fingerprint(smiles):
-  """Generates a Morgan fingerprint bit vector (Radius 3, ECFP6-equivalent)
-
-  as a list of integers (0/1) from a QSAR-ready SMILES string using RDKit.
-  """
+def get_fp_list(smiles):
   if pd.isna(smiles):
-    return None
+    return [0] * 2048  # Default zero vector for missing chemicals
   try:
     mol = Chem.MolFromSmiles(str(smiles))
     if mol is not None:
-      fp = morgan_generator.GetFingerprint(mol)
-      return list(fp)
+      return list(morgan_generator.GetFingerprint(mol))
   except Exception:
     pass
-  return None
+  return [0] * 2048
 
 
 print("Generating Radius 3 Morgan fingerprints...")
-merged_df["MORGAN_FP_R3"] = merged_df["QSAR_READY_SMILES"].apply(
-    get_morgan_fingerprint
-)
+fp_lists = merged_df["QSAR_READY_SMILES"].apply(get_fp_list)
+
 
 # ---------------------------------------------------------
-# Part 4: Export Compact Dataset
+# Part 4A: Create the GitHub-Friendly (Compact) File
 # ---------------------------------------------------------
-output_filename = "LUC_Master_dataset_with_morgan_fps_r3.csv"
-merged_df.to_csv(output_filename, index=False)
+# Stores fingerprints as a single list column to keep file size small
+compact_df = merged_df.copy()
+compact_df["MORGAN_FP_R3"] = fp_lists.apply(
+    lambda x: x if sum(x) > 0 else None
+)  # Keep None for invalid/missing
 
-print(f"Successfully created '{output_filename}' with shape: {merged_df.shape}")
-print(
-    f"Total valid fingerprints generated:"
-    f" {merged_df['MORGAN_FP_R3'].notna().sum()}"
-)
+compact_filename = "LUC_Master_dataset_compact.csv"
+compact_df.to_csv(compact_filename, index=False)
+print(f"✅ Created GitHub-friendly file: '{compact_filename}'")
+
+
+# ---------------------------------------------------------
+# Part 4B: Create the Model-Ready (Expanded) File
+# ---------------------------------------------------------
+# Expands fingerprints into 2048 separate binary columns (FP_R3_0 to FP_R3_2047)
+fp_df = pd.DataFrame(fp_lists.tolist(), index=merged_df.index, dtype=np.int8)
+fp_df.columns = [f"FP_R3_{i}" for i in range(2048)]
+
+expanded_df = pd.concat([merged_df, fp_df], axis=1)
+
+expanded_filename = "LUC_Master_dataset_expanded.csv"
+expanded_df.to_csv(expanded_filename, index=False)
+print(f"✅ Created model-ready file: '{expanded_filename}'")
+
+print(f"\nProcessing complete! Dataset shape: {merged_df.shape}")
