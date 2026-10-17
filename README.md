@@ -54,6 +54,12 @@ The code written in AR Agonist Pipowski_2 takes a LUC Assay and LUC Viability As
   - LOGAC50_Viabilty: This column is the linearization of the AC50 for the purpose of regression calculations and comparisons.
   - SMILES: This column showcases the SMILES string for each chemical.
   - MORGAN_FP: This column is the Morgan Fingerprint of each chemical.
-The code also generates a missing data report for each column in counts and percentages. In addition, it gives a data report on the chemical counts, the amount of active and inactive chemicals, and how many chemicals are active across both assays. 
+The code also generates a missing data report for each column in counts and percentages. In addition, it gives a data report on the chemical counts, the amount of active and inactive chemicals, and how many chemicals are active across both assays.
+
+The code in Artificial Neural Network is a code that creates a linear regression model and an Neural Network model, trains them, and then predicts the boiling point of butane. It also generates plots that showcase the regression fits, the residuals, and evaluates the accuracy of the model. 
+
+The code in Convolution where we create an image of an Asterisks using binary code to test fitters and their ability to show where the image is. It generates a heatmap of each fitter as well. 
+
+The code in QLearning creates a Q-table agent that navigates the Frozen environment, and trains that agent, saving the Q-table for later use. In addition, it generates a learning curve plot to show how the agent learns over time. In addition, it runs a 100 episode simulation. 
 
 Alongside the assigned coding projects, I will be keeping a private ethics portfolio where I reflect on my learning and how it impacts the kind of scientists I am developing into. 
