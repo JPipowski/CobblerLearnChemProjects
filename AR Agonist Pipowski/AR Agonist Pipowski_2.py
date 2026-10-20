@@ -4,13 +4,46 @@ from rdkit import Chem
 from rdkit.Chem import rdFingerprintGenerator
 
 # ---------------------------------------------------------
+# Part 0: Create the LUC Master Dataset from Assay Lists
+# ---------------------------------------------------------
+file_viability = (
+    "Assay List TOX21_AR_LUC_MDAKB2_Agonist_3uM_Nilutamide_viability-2026-10-06.csv"
+)
+file_agonist = "Assay List TOX21_AR_LUC_MDAKB2_Agonist-2026-10-09.csv"
+
+print("Loading assay list datasets...")
+viability_df = pd.read_csv(file_viability)
+agonist_df = pd.read_csv(file_agonist)
+
+# Combine the two assay lists (outer join on DTXSID and shared descriptive columns)
+merge_cols = [
+    "DTXSID",
+    "PREFERRED NAME",
+    "CASRN",
+    "MOLECULAR FORMULA",
+    "MONOISOTOPIC MASS",
+]
+luc_master_df = pd.merge(
+    viability_df,
+    agonist_df,
+    on=merge_cols,
+    how="outer",
+    suffixes=(_viability, _agonist),
+)
+
+file_master = "LUC_Master_dataset.csv"
+luc_master_df.to_csv(file_master, index=False)
+print(f"✅ Created master dataset file: '{file_master}'")
+
+
+# ---------------------------------------------------------
 # Part 1: Load Datasets
 # ---------------------------------------------------------
-file_master = "LUC_Master_dataset.csv"
 file_ccd = "CCD-Batch-Search_2026-10-16_05_15_34.csv"
 
 luc_df = pd.read_csv(file_master)
 ccd_df = pd.read_csv(file_ccd)
+
 
 # ---------------------------------------------------------
 # Part 2: Normalize DTXSID & Merge SMILES Data
@@ -57,7 +90,6 @@ fp_lists = merged_df["QSAR_READY_SMILES"].apply(get_fp_list)
 # ---------------------------------------------------------
 # Part 4A: Create the GitHub-Friendly (Compact) File
 # ---------------------------------------------------------
-# Stores fingerprints as a single list column to keep file size small
 compact_df = merged_df.copy()
 compact_df["MORGAN_FP_R3"] = fp_lists.apply(
     lambda x: x if sum(x) > 0 else None
@@ -71,7 +103,6 @@ print(f"✅ Created GitHub-friendly file: '{compact_filename}'")
 # ---------------------------------------------------------
 # Part 4B: Create the Model-Ready (Expanded) File
 # ---------------------------------------------------------
-# Expands fingerprints into 2048 separate binary columns (FP_R3_0 to FP_R3_2047)
 fp_df = pd.DataFrame(fp_lists.tolist(), index=merged_df.index, dtype=np.int8)
 fp_df.columns = [f"FP_R3_{i}" for i in range(2048)]
 
