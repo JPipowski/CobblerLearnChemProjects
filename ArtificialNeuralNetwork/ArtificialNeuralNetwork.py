@@ -1,3 +1,4 @@
+import subprocess
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
@@ -38,7 +39,6 @@ Y_train = df_train['BP (°C)']
 X_butane = butane_row[['MW (g/mol)']]
 real_butane_bp = butane_row['BP (°C)'].values[0]
 
-
 # ==========================================
 # 3. LINEAR REGRESSION MODEL (Retrained)
 # ==========================================
@@ -56,9 +56,7 @@ print(f"Training MAE: {mae_lr:.2f}°C")
 print(f"Training MSE: {mse_lr:.2f}")
 print(f"Training R²:  {r2_lr:.2f}\n")
 
-# Predict Butane using Linear Regression
 pred_butane_lr = lr_model.predict(X_butane)[0]
-
 
 # ==========================================
 # 4. NEURAL NETWORK MODEL (Retrained)
@@ -80,7 +78,6 @@ mlp_model = MLPRegressor(
 mlp_model.fit(X_train_scaled, Y_train)
 Y_pred_mlp_train = mlp_model.predict(X_train_scaled)
 
-# Print training epochs used
 print(f"Neural Network training epochs actually used: {mlp_model.n_iter_}")
 
 # Metrics on Training Set
@@ -92,10 +89,8 @@ print(f"Training MAE: {mae_mlp:.2f}°C")
 print(f"Training MSE: {mse_mlp:.2f}")
 print(f"Training R²:  {r2_mlp:.2f}\n")
 
-# Predict Butane using Neural Network
 X_butane_scaled = scaler.transform(X_butane)
 pred_butane_mlp = mlp_model.predict(X_butane_scaled)[0]
-
 
 # ==========================================
 # 5. COMPARISON & METRICS SUMMARY OUTPUT
@@ -113,7 +108,6 @@ print(f"Butane Real BP:        {real_butane_bp:.2f}°C")
 print(f"Linear Reg Prediction: {pred_butane_lr:.2f}°C")
 print(f"Neural Net Prediction: {pred_butane_mlp:.2f}°C")
 print("==========================================")
-
 
 # ==========================================
 # 6. SAVE PLOTS TO DIRECTORY
@@ -148,7 +142,7 @@ plt.figure(figsize=(9, 6))
 for i in range(weights.shape[1]):
     z = X_dense_scaled * weights[0, i] + biases[i]
     relu_out = np.maximum(0, z)
-    plt.plot(X_dense, relu_out, label=f'Neuron {i+1}')
+    plt.plot(X_dense, relu_out, label=f'Neuron {i + 1}')
 
 plt.xlabel('Molecular Weight (g/mol)')
 plt.ylabel('ReLU Output Value')
@@ -161,8 +155,10 @@ plt.close()
 
 # C. Real vs Predicted Comparison Plot for Butane
 plt.figure(figsize=(7, 7))
-plt.scatter([real_butane_bp], [pred_butane_lr], color='red', label=f'Linear Reg ({pred_butane_lr:.1f}°C)', s=150, zorder=5)
-plt.scatter([real_butane_bp], [pred_butane_mlp], color='green', label=f'Neural Net ({pred_butane_mlp:.1f}°C)', s=150, zorder=5)
+plt.scatter([real_butane_bp], [pred_butane_lr], color='red', label=f'Linear Reg ({pred_butane_lr:.1f}°C)', s=150,
+            zorder=5)
+plt.scatter([real_butane_bp], [pred_butane_mlp], color='green', label=f'Neural Net ({pred_butane_mlp:.1f}°C)', s=150,
+            zorder=5)
 
 min_v = min(real_butane_bp, pred_butane_lr, pred_butane_mlp) - 30
 max_v = max(real_butane_bp, pred_butane_lr, pred_butane_mlp) + 30
@@ -225,4 +221,38 @@ plt.grid(True, linestyle='--', alpha=0.6)
 plt.savefig('mlp_residuals_plot.png', dpi=300, bbox_inches='tight')
 plt.close()
 
-print("\n[Success] All models, predictions, epochs tracking, and plots generated and saved successfully!")
+print("\n[Success] All models, predictions, and plots generated successfully!")
+
+
+# ==========================================
+# 7. AUTOMATED GIT COMMIT AND PUSH TO GITHUB
+# ==========================================
+def commit_and_push_plots():
+    try:
+        print("\n--- Pushing plots to GitHub ---")
+
+        # Stage all PNG image files
+        subprocess.run(["git", "add", "*.png"], check=True)
+
+        # Check if there are changes to commit
+        status_result = subprocess.run(["git", "status", "--porcelain"], capture_output=True, text=True, check=True)
+        if not status_result.stdout.strip():
+            print("No new changes in plot files to commit.")
+            return
+
+        # Commit changes
+        commit_message = "Auto-update model evaluation plots and neural network analysis"
+        subprocess.run(["git", "commit", "-m", commit_message], check=True)
+
+        # Push to remote repository (defaults to current branch / origin)
+        subprocess.run(["git", "push"], check=True)
+        print("[Success] Plots successfully committed and pushed to GitHub!")
+
+    except subprocess.CalledProcessError as e:
+        print(f"[Error] Git command failed: {e}")
+    except Exception as e:
+        print(f"[Error] An unexpected error occurred during git operations: {e}")
+
+
+# Run the git automation
+commit_and_push_plots()

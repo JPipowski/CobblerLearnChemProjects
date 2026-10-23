@@ -1,3 +1,4 @@
+import subprocess
 import gymnasium as gym
 import numpy as np
 import matplotlib.pyplot as plt
@@ -5,14 +6,12 @@ import matplotlib.pyplot as plt
 # ==========================================
 # 1. ENVIRONMENT & HYPERPARAMETERS
 # ==========================================
-# Create environment with render_mode='ansi' to visualize navigation steps
 env = gym.make("FrozenLake-v1", render_mode="ansi")
 
 print("--- FrozenLake-v1 Environment Information ---")
 print(f"Observation Space (States): {env.observation_space}")
 print(f"Action Space (Actions):     {env.action_space}")
 
-# Hyperparameter Experimentation Set
 num_episodes = 5000
 learning_rate = 0.1  # Alpha
 discount_factor = 0.99  # Gamma
@@ -43,13 +42,11 @@ for episode in range(num_episodes):
     total_episode_reward = 0
 
     while not (terminated or truncated):
-        # Exploration-exploitation trade-off (Epsilon-greedy)
         if np.random.uniform(0, 1) < epsilon:
-            action = env.action_space.sample()  # Explore (random action)
+            action = env.action_space.sample()  # Explore
         else:
-            action = np.argmax(q_table[state])  # Exploit (best learned action)
+            action = np.argmax(q_table[state])  # Exploit
 
-        # Execute action
         next_state, reward, terminated, truncated, info = env.step(action)
 
         # Bellman Equation Update
@@ -61,7 +58,6 @@ for episode in range(num_episodes):
         state = next_state
         total_episode_reward += reward
 
-    # Decay epsilon
     epsilon = min_epsilon + (max_epsilon - min_epsilon) * np.exp(-decay_rate * episode)
     rewards_all_episodes.append(total_episode_reward)
 
@@ -74,18 +70,13 @@ q_table_filename = "frozenlake_q_table.npy"
 np.save(q_table_filename, q_table)
 print(f"\n[Success] Q-table saved to '{q_table_filename}' for later use.")
 
-# (Optional Demonstration) Reloading Q-table from file:
-# loaded_q_table = np.load(q_table_filename)
-
-
 # ==========================================
 # 5. GENERATE LEARNING CURVE PLOT
 # ==========================================
-# Calculate moving average of rewards over blocks of 100 episodes to show clear trends
 block_size = 100
 episodes_blocks = range(0, num_episodes, block_size)
 moving_avg_rewards = [
-    np.mean(rewards_all_episodes[i:i + block_size]) * 100  # Convert to success percentage per block
+    np.mean(rewards_all_episodes[i:i + block_size]) * 100
     for i in episodes_blocks
 ]
 
@@ -115,7 +106,6 @@ def display_policy_grid(q_tbl):
 
 display_policy_grid(q_table)
 
-# Test agent over 100 episodes (No exploration)
 num_test_episodes = 100
 success_count = 0
 
@@ -159,3 +149,37 @@ while not (terminated or truncated):
 
 test_env.close()
 env.close()
+
+
+# ==========================================
+# 8. AUTOMATED GIT COMMIT AND PUSH TO GITHUB
+# ==========================================
+def commit_and_push_learning_curve():
+    try:
+        print("\n--- Pushing learning curve plot to GitHub ---")
+
+        # Stage the learning curve plot file
+        subprocess.run(["git", "add", "learning_curve.png"], check=True)
+
+        # Check if there are changes to commit
+        status_result = subprocess.run(["git", "status", "--porcelain"], capture_output=True, text=True, check=True)
+        if not status_result.stdout.strip():
+            print("No new changes in learning curve plot to commit.")
+            return
+
+        # Commit changes
+        commit_message = "Auto-update FrozenLake Q-learning curve plot"
+        subprocess.run(["git", "commit", "-m", commit_message], check=True)
+
+        # Push to remote repository
+        subprocess.run(["git", "push"], check=True)
+        print("[Success] Learning curve plot successfully committed and pushed to GitHub!")
+
+    except subprocess.CalledProcessError as e:
+        print(f"[Error] Git command failed: {e}")
+    except Exception as e:
+        print(f"[Error] An unexpected error occurred during git operations: {e}")
+
+
+# Run the git automation
+commit_and_push_learning_curve()
