@@ -30,9 +30,7 @@ models = {
 # 3. Evaluate each model using 5-Fold Cross-Validation
 results = []
 for name, model in models.items():
-    # cv=5 splits the data into 5 folds, scoring using R^2 by default
     cv_scores = cross_val_score(model, X, y, cv=5, scoring='r2')
-
     results.append({
         "Model": name,
         "Mean R² Score": cv_scores.mean(),
@@ -43,15 +41,35 @@ for name, model in models.items():
 results_df = pd.DataFrame(results)
 results_df = results_df.sort_values(by="Mean R² Score", ascending=False).reset_index(drop=True)
 
-print("\n" + "=" * 50)
+print("\n" + "="*50)
 print(" 5-FOLD CROSS-VALIDATION PERFORMANCE RESULTS ")
-print("=" * 50)
+print("="*50)
 print(results_df.to_string(index=False))
 
-# 4. Train the final Random Forest model on the FULL dataset for maximum prediction accuracy
+# 4. Train the final Random Forest model on the FULL dataset
 print("\nTraining final Random Forest model on full dataset...")
 rf_model = RandomForestRegressor(random_state=42, n_estimators=100)
 rf_model.fit(X, y)
+
+# 5. Extract and display Feature Importances
+feature_importances = pd.DataFrame({
+    "Feature": X.columns,
+    "Importance Score": rf_model.feature_importances_
+}).sort_values(by="Importance Score", ascending=False).reset_index(drop=True)
+
+print("\n" + "="*50)
+print(" RANDOM FOREST FEATURE IMPORTANCES (Impact Ranking) ")
+print("="*50)
+print(feature_importances.to_string(index=False))
+
+# Plot and save feature importances as a bar chart
+plt.figure(figsize=(10, 6))
+plt.barh(feature_importances["Feature"][::-1], feature_importances["Importance Score"][::-1], color="skyblue", edgecolor="black")
+plt.xlabel("Importance Score", fontsize=12)
+plt.title("Feature Impact on California Housing Predictions (Random Forest)", fontsize=14)
+plt.tight_layout()
+plt.savefig("feature_importances.png", dpi=300, bbox_inches="tight")
+print("\nFeature importance chart saved as 'feature_importances.png'.")
 
 # Save and plot histograms for all features once
 X.hist(bins=30, figsize=(12, 10), edgecolor="black")
@@ -60,7 +78,7 @@ plt.tight_layout(rect=[0, 0.03, 1, 0.95])
 plt.savefig("all_features_distributions.png", dpi=300, bbox_inches="tight")
 print("Histogram saved as 'all_features_distributions.png'.")
 
-# 5. Interactive Multi-Prediction Loop
+# 6. Interactive Multi-Prediction Loop
 feature_prompts = [
     ("MedInc", "Median income in block group ($10k units, e.g., 5.5 for $55,000): "),
     ("HouseAge", "Median house age in years (e.g., 25): "),
@@ -73,9 +91,9 @@ feature_prompts = [
 ]
 
 while True:
-    print("\n" + "=" * 50)
+    print("\n" + "="*50)
     print(" NEW HOUSE PRICE PREDICTION (Type 'q' to quit) ")
-    print("=" * 50)
+    print("="*50)
 
     user_inputs = []
     quit_flag = False
@@ -99,10 +117,10 @@ while True:
         print("\nExiting prediction loop. Have a great day!")
         break
 
-    # Run the prediction using the fully trained Random Forest model
+    # Run prediction using the fully trained Random Forest model
     sample_neighborhood = pd.DataFrame([user_inputs], columns=X.columns)
     predicted_price = rf_model.predict(sample_neighborhood)
 
-    print("\n" + "-" * 40)
+    print("\n" + "-"*40)
     print(f"💰 Predicted House Price: ${predicted_price[0] * 100000:,.2f}")
     print("-" * 40)
