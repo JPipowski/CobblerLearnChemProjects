@@ -62,4 +62,8 @@ The code in Convolution where we create an image of an Asterisks using binary co
 
 The code in QLearning creates a Q-table agent that navigates the Frozen environment, and trains that agent, saving the Q-table for later use. In addition, it generates a learning curve plot to show how the agent learns over time. In addition, it runs a 100 episode simulation. 
 
+The code in CaliforniaHousing is two fold. The first file, housing_regession.py imports the _fetch_california_housing_ from scikit-learn and uses 5-fold cross validation to model it in Random Forest, SVM, Decision Tree, and Linear Regression. Based on the R^2 value, it took the best model (Random Forest in this example) and trains the model. It allows the model to be inputted without restarting the program. The Code in housing_gui.py creates a interactive GUI using Tkinter package. I also created an .exe file for the GUI but it is too big to upload to github.
+
+The code in Iris Clustering imports the Iris Dataset from Scikit-learn package. We removed the flower names and used KMeans from sklearn.cluster to create a model. We used 3 Clusters and created the scatterplot. Then we used 6 Clusters and created a 3D plot of the clusters. 
+
 Alongside the assigned coding projects, I will be keeping a private ethics portfolio where I reflect on my learning and how it impacts the kind of scientists I am developing into. 
