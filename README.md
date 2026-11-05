@@ -55,10 +55,15 @@ The code written in AR Agonist Pipowski_2 takes a LUC Assay and LUC Viability As
   - SMILES: This column showcases the SMILES string for each chemical.
   - ECFP6 and FCFP6: These columns are the chemical fingerprint of each chemical in two different ways.
 The code also generates a missing data report for each column in counts and percentages. In addition, it gives a data report on the chemical counts, the amount of active and inactive chemicals, and how many chemicals are active across both assays.
+
 Dataset Descriptives, Not MasterDataset.py - This writes python code to provide information about the missing data in the datasets as they were merged and edited. It also provides chemical counts as the datasets merge as well using DTXSID.
+
 Descriptives For AR Agonist - This python script also writes code to provide information about chemical counts and missing data but specifically within the master dataset.
+
 AR Agonist Model training - This python script creates code that tests the use of ECFP6 and FCFP6 chemical fingerprints and their ability to create a model using 3 imputation strategies (RF, SVM, and KNN), Using X-Boost (A way to address the class imbalance), and a 5-fold cross-validation and compares them to each other using ROC-AUC and PR-AUC. It uses only ECFP6, then only FCFP6, and then both together to create several models for potential use.
+
 AR Agonist Model Training Combined Assay - This python script runs the same method as the previous script but combines the assays instead of running them separately to create a new model.
+
 AR Agonist Best Model Testing - This python script takes the best models from the model testing and training, being that of the Concatenated Fingerprints using Random Forest and X-Boost and a 5-fold cross validation to train a model, give separate and a global ROC-AUC and PR-AUC, and predict a sample SMILES string for agonist and variability. 
 
 The code in Artificial Neural Network is a code that creates a linear regression model and an Neural Network model, trains them, and then predicts the boiling point of butane. It also generates plots that showcase the regression fits, the residuals, and evaluates the accuracy of the model. 
