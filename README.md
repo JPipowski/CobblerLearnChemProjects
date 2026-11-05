@@ -66,4 +66,10 @@ The code in CaliforniaHousing is two fold. The first file, housing_regession.py 
 
 The code in Iris Clustering imports the Iris Dataset from Scikit-learn package. We removed the flower names and used KMeans from sklearn.cluster to create a model. We used 3 Clusters and created the scatterplot. Then we used 6 Clusters and created a 3D plot of the clusters. 
 
+Cartpole_rl - This code creates a Q-learning deep learning network using the gymnasium library to create the cartpole and loops rewards and penaltites to learn how to predict when the pole will fall. 
+
+ImageClassifier - Using a similar method to CNN in a previous book chapter, the code in this chapter adapts the CNN to be able to take an image, convert it into a usable image and predict the image content.
+
+StructureComparison: This complex code uploads a experimental and alphafold predicted structures (in PDB files) and creates several metrics and visualizations to compare the structures and how different the predicted structure was from the experimental structure. In this case, we specifically used Insulin. 
+
 Alongside the assigned coding projects, I will be keeping a private ethics portfolio where I reflect on my learning and how it impacts the kind of scientists I am developing into. 
