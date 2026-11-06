@@ -1,0 +1,4 @@
+SMILES,Agonist_Probability,Agonist_Call,Viability_Probability,Viability_Call,Agonist_Threshold,Viability_Threshold,Agonist_ROC_AUC,Agonist_PR_AUC,Agonist_Precision,Agonist_Recall,Agonist_F1,Viability_ROC_AUC,Viability_PR_AUC,Viability_Precision,Viability_Recall,Viability_F1,Global_Macro_ROC_AUC,Global_Macro_PR_AUC,Global_Macro_Precision,Global_Macro_Recall,Global_Macro_F1
+CC(=O)OC1=CC=CC=C1C(=O)O,0.0175,INACTIVE,0.0467,SAFE (Inactive),0.76,0.41,0.7444,0.4327,0.8462,0.3667,0.5116,0.8669,0.5761,0.6605,0.4486,0.5343,0.8057,0.5044,0.7533,0.4076,0.523
+CN1C=NC2=C1C(=O)N(C(=O)N2C)C,0.0014,INACTIVE,0.5821,CYTOTOXIC (Active),0.76,0.41,0.7444,0.4327,0.8462,0.3667,0.5116,0.8669,0.5761,0.6605,0.4486,0.5343,0.8057,0.5044,0.7533,0.4076,0.523
+CC(C)CC1=CC=C(C=C1)C(C)C(=O)O,0.0028,INACTIVE,0.0137,SAFE (Inactive),0.76,0.41,0.7444,0.4327,0.8462,0.3667,0.5116,0.8669,0.5761,0.6605,0.4486,0.5343,0.8057,0.5044,0.7533,0.4076,0.523
