@@ -1,7 +1,8 @@
 import numpy as np
 import pandas as pd
 from rdkit import Chem
-from rdkit.Chem import rdFingerprintGenerator
+from rdkit.Chem import SaltRemover, rdFingerprintGenerator
+from rdkit.Chem.MolStandardize import rdMolStandardize
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.metrics import (
     average_precision_score,
@@ -29,7 +30,7 @@ def parse_fingerprints(fp_series):
 required_cols = target_cols + fp_cols
 model_df = df.dropna(subset=required_cols).copy()
 
-# Concatenate 2048-bit ECFP6 + 2048-bit FCFP6 features (4096 total)
+# Use pre-computed fingerprints from master dataset for training (Zero RDKit Overhead)
 X_ecfp = parse_fingerprints(model_df["ECFP6_Str"])
 X_fcfp = parse_fingerprints(model_df["FCFP6_Str"])
 X_train_full = np.hstack([X_ecfp, X_fcfp])
@@ -39,7 +40,7 @@ Y_train_full = np.column_stack([
     model_df[target_cols[1]].apply(lambda x: 1 if x == "Active" else 0).values,
 ])
 
-# 2. Cross-Validation Evaluation & Threshold Optimization
+# 2. Cross-Validation Evaluation & Threshold Optimization (RF + XGBoost Ensemble)
 cv = StratifiedKFold(n_splits=5, shuffle=True, random_state=42)
 
 base_rf_cv = RandomForestClassifier(
@@ -56,19 +57,24 @@ y_true_ag, y_prob_ag = [], []
 y_true_vi, y_prob_vi = [], []
 
 print(
-    "Running 5-Fold Cross-Validation for Threshold Optimization & Metrics..."
+    "Running 5-Fold Cross-Validation (Random Forest + XGBoost on Concatenated"
+    " Fingerprints)..."
 )
 for train_idx, val_idx in cv.split(X_train_full, Y_train_full[:, 0]):
     X_tr, X_va = X_train_full[train_idx], X_train_full[val_idx]
-    multi_rf_cv.fit(X_tr, Y_train_full[train_idx])
-    multi_xgb_cv.fit(X_tr, Y_train_full[train_idx])
+    y_tr_fold = Y_train_full[train_idx]
+    y_va_fold = Y_train_full[val_idx]
+
+    multi_rf_cv.fit(X_tr, y_tr_fold)
+    multi_xgb_cv.fit(X_tr, y_tr_fold)
 
     p_rf = multi_rf_cv.predict_proba(X_va)
     p_xgb = multi_xgb_cv.predict_proba(X_va)
 
-    y_true_ag.extend(Y_train_full[val_idx, 0])
+    y_true_ag.extend(y_va_fold[:, 0])
     y_prob_ag.extend(0.5 * p_rf[0][:, 1] + 0.5 * p_xgb[0][:, 1])
-    y_true_vi.extend(Y_train_full[val_idx, 1])
+
+    y_true_vi.extend(y_va_fold[:, 1])
     y_prob_vi.extend(0.5 * p_rf[1][:, 1] + 0.5 * p_xgb[1][:, 1])
 
 
@@ -114,14 +120,57 @@ macro_f1 = (f1_ag + f1_vi) / 2
 # Explicitly print CV metrics with optimized thresholds
 print("\n--- Cross-Validation Evaluation Metrics (Optimized Thresholds) ---")
 print(
-    f"Agonist   - Threshold: {opt_thresh_ag:.2f} | ROC-AUC: {roc_ag:.4f} | PR-AUC: {pr_ag:.4f} | Precision: {prec_ag:.4f} | Recall: {rec_ag:.4f} | F1: {f1_ag:.4f}"
+    f"Agonist   - Threshold: {opt_thresh_ag:.2f} | ROC-AUC: {roc_ag:.4f} |"
+    f" PR-AUC: {pr_ag:.4f} | Precision: {prec_ag:.4f} | Recall: {rec_ag:.4f}"
+    f" | F1: {f1_ag:.4f}"
 )
 print(
-    f"Viability - Threshold: {opt_thresh_vi:.2f} | ROC-AUC: {roc_vi:.4f} | PR-AUC: {pr_vi:.4f} | Precision: {prec_vi:.4f} | Recall: {rec_vi:.4f} | F1: {f1_vi:.4f}"
+    f"Viability - Threshold: {opt_thresh_vi:.2f} | ROC-AUC: {roc_vi:.4f} |"
+    f" PR-AUC: {pr_vi:.4f} | Precision: {prec_vi:.4f} | Recall: {rec_vi:.4f}"
+    f" | F1: {f1_vi:.4f}"
 )
 print(
-    f"Macro Avg - ROC-AUC: {macro_roc:.4f} | PR-AUC: {macro_pr:.4f} | Precision: {macro_prec:.4f} | Recall: {macro_rec:.4f} | F1: {macro_f1:.4f}\n"
+    f"Macro Avg - ROC-AUC: {macro_roc:.4f} | PR-AUC: {macro_pr:.4f} |"
+    f" Precision: {macro_prec:.4f} | Recall: {macro_rec:.4f} | F1:"
+    f" {macro_f1:.4f}\n"
 )
+
+# SAVE FILE 1: Dedicated Model Evaluation Metrics CSV
+cv_metrics_df = pd.DataFrame([
+    {
+        "Model Combination": "Random Forest + XGBoost (Concatenated ECFP6+FCFP6)",
+        "Endpoint": "Agonist",
+        "Threshold": round(opt_thresh_ag, 2),
+        "ROC_AUC": round(roc_ag, 4),
+        "PR_AUC": round(pr_ag, 4),
+        "Precision": round(prec_ag, 4),
+        "Recall": round(rec_ag, 4),
+        "F1_Score": round(f1_ag, 4),
+    },
+    {
+        "Model Combination": "Random Forest + XGBoost (Concatenated ECFP6+FCFP6)",
+        "Endpoint": "Viability",
+        "Threshold": round(opt_thresh_vi, 2),
+        "ROC_AUC": round(roc_vi, 4),
+        "PR_AUC": round(pr_vi, 4),
+        "Precision": round(prec_vi, 4),
+        "Recall": round(rec_vi, 4),
+        "F1_Score": round(f1_vi, 4),
+    },
+    {
+        "Model Combination": "Random Forest + XGBoost (Concatenated ECFP6+FCFP6)",
+        "Endpoint": "Macro_Average",
+        "Threshold": np.nan,
+        "ROC_AUC": round(macro_roc, 4),
+        "PR_AUC": round(macro_pr, 4),
+        "Precision": round(macro_prec, 4),
+        "Recall": round(macro_rec, 4),
+        "F1_Score": round(macro_f1, 4),
+    },
+])
+cv_metrics_csv = "QSAR_CV_Performance_Metrics.csv"
+cv_metrics_df.to_csv(cv_metrics_csv, index=False)
+print(f"Model Performance Metrics CSV saved successfully: {cv_metrics_csv}")
 
 # 3. Train Final Model on All Data
 print("Training Final Model on Complete Dataset...")
@@ -138,7 +187,7 @@ multi_xgb = MultiOutputClassifier(base_xgb, n_jobs=-1)
 multi_rf.fit(X_train_full, Y_train_full)
 multi_xgb.fit(X_train_full, Y_train_full)
 
-# 4. RDKit Generators & Batch Inference Function
+# 4. RDKit Generators & QSAR-Ready Curation Pipeline for New SMILES Inference
 ecfp_gen = rdFingerprintGenerator.GetMorganGenerator(radius=3, fpSize=2048)
 fcfp_gen = rdFingerprintGenerator.GetMorganGenerator(
     radius=3,
@@ -146,11 +195,23 @@ fcfp_gen = rdFingerprintGenerator.GetMorganGenerator(
     atomInvariantsGenerator=rdFingerprintGenerator.GetMorganFeatureAtomInvGen(),
 )
 
+salt_remover = SaltRemover.SaltRemover()
+uncharger = rdMolStandardize.Uncharger()
+fragment_chooser = rdMolStandardize.LargestFragmentChooser()
 
-def get_fingerprints(smiles):
+
+def get_qsar_ready_fingerprints(smiles):
     mol = Chem.MolFromSmiles(smiles)
     if mol is None:
         return None
+    try:
+        mol = salt_remover.StripMol(mol)
+        mol = uncharger.uncharge(mol)
+        mol = fragment_chooser.choose(mol)
+        Chem.SanitizeMol(mol)
+    except Exception:
+        pass
+
     ecfp = ecfp_gen.GetFingerprintAsNumPy(mol)
     fcfp = fcfp_gen.GetFingerprintAsNumPy(mol)
     return np.hstack([ecfp, fcfp]).reshape(1, -1)
@@ -162,7 +223,7 @@ def generate_documentation_csv(
     records = []
 
     for smiles in smiles_list:
-        X_new = get_fingerprints(smiles)
+        X_new = get_qsar_ready_fingerprints(smiles)
 
         if X_new is None:
             records.append({
@@ -230,11 +291,11 @@ def generate_documentation_csv(
 
     doc_df = pd.DataFrame(records)
     doc_df.to_csv(output_csv, index=False)
-    print(f"\nDocumentation CSV exported successfully: {output_csv}")
+    print(f"Batch Predictions Documentation CSV saved: {output_csv}")
     return doc_df
 
 
-# 5. Example Batch Run
+# 5. Example Batch Run with New/External SMILES
 input_smiles = [
     "CC(=O)OC1=CC=CC=C1C(=O)O",  # Aspirin
     "CN1C=NC2=C1C(=O)N(C(=O)N2C)C",  # Caffeine

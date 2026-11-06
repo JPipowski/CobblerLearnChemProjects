@@ -1,0 +1,4 @@
+Model Combination,Endpoint,Threshold,ROC_AUC,PR_AUC,Precision,Recall,F1_Score
+Random Forest + XGBoost (Concatenated ECFP6+FCFP6),Agonist,0.76,0.7444,0.4327,0.8462,0.3667,0.5116
+Random Forest + XGBoost (Concatenated ECFP6+FCFP6),Viability,0.41,0.8669,0.5761,0.6605,0.4486,0.5343
+Random Forest + XGBoost (Concatenated ECFP6+FCFP6),Macro_Average,,0.8057,0.5044,0.7533,0.4076,0.523

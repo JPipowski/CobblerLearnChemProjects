@@ -1,0 +1,10 @@
+Configuration,Model,Optimal Threshold,Mean ROC-AUC,Mean PR-AUC,Precision,Recall,F1-Score,Raw_ROC_AUC,Raw_PR_AUC
+ECFP6 Only + Viability Feature,Random Forest + XGBoost,0.73,0.7377 (±0.0305),0.4096 (±0.0627),0.7023,0.3833,0.496,0.7377,0.4096
+ECFP6 Only + Viability Feature,SVM + XGBoost,0.48,0.7241 (±0.0243),0.3581 (±0.0827),0.6309,0.3917,0.4833,0.7241,0.3581
+ECFP6 Only + Viability Feature,KNN + XGBoost,0.59,0.7154 (±0.0212),0.4202 (±0.0673),0.8286,0.3625,0.5043,0.7154,0.4202
+FCFP6 Only + Viability Feature,Random Forest + XGBoost,0.74,0.7353 (±0.0424),0.4073 (±0.0745),0.6547,0.3792,0.4802,0.7353,0.4073
+FCFP6 Only + Viability Feature,SVM + XGBoost,0.5,0.7084 (±0.0541),0.3697 (±0.0971),0.6174,0.3833,0.473,0.7084,0.3697
+FCFP6 Only + Viability Feature,KNN + XGBoost,0.64,0.7058 (±0.0482),0.4333 (±0.0612),0.8519,0.3833,0.5287,0.7058,0.4333
+Concatenated (ECFP6 + FCFP6) + Viability Feature,Random Forest + XGBoost,0.8,0.7454 (±0.0247),0.4106 (±0.0608),0.7236,0.3708,0.4904,0.7454,0.4106
+Concatenated (ECFP6 + FCFP6) + Viability Feature,SVM + XGBoost,0.53,0.7260 (±0.0231),0.3726 (±0.0836),0.6593,0.3708,0.4747,0.726,0.3726
+Concatenated (ECFP6 + FCFP6) + Viability Feature,KNN + XGBoost,0.62,0.7215 (±0.0190),0.4301 (±0.0573),0.8462,0.3667,0.5116,0.7215,0.4301
