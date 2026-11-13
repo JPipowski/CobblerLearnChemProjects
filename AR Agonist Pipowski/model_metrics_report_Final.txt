@@ -1,0 +1,15 @@
+QSAR Model Performance & Confusion Matrix Report
+==================================================
+Threshold Evaluated: 0.76
+ROC AUC: 0.9998
+
+Confusion Matrix Counts:
+- True Positives (TP): 155
+- False Positives (FP): 0
+- True Negatives (TN): 6711
+- False Negatives (FN): 85
+
+Key Metrics:
+- Sensitivity (Recall / TPR): 0.6458
+- Precision: 1.0000
+- F1-Score: 0.7848
