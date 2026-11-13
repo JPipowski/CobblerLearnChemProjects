@@ -1,0 +1,39 @@
+Structure,CAS RN,Resolved SMILES,Agonist (Act / Inact),Viability (Cyt / Safe),Status
+No Image,2754428-18-5,Resolution Failed,-,-,FAILED
+structure_2.png,35079-97-1,NC(=O)N1c2ccccc2C(O)C(O)c3ccccc13,"Act: 0.0157
+Inact: 0.9843 [INACTIVE]","Cyt: 0.1128
+Safe: 0.8872 [SAFE]",SUCCESS
+structure_3.png,62498-67-3,CNCCCC1(OCc2cc(ccc12)C#N)c3ccc(F)cc3,"Act: 0.0544
+Inact: 0.9456 [INACTIVE]","Cyt: 0.4689
+Safe: 0.5311 [CYTOTOXIC]",SUCCESS
+structure_4.png,93413-62-8,CN(C)CC(c1ccc(O)cc1)C2(O)CCCCC2,"Act: 0.0439
+Inact: 0.9561 [INACTIVE]","Cyt: 0.0624
+Safe: 0.9376 [SAFE]",SUCCESS
+structure_5.png,29331-92-8,NC(=O)N1c2ccccc2CC(O)c3ccccc13,"Act: 0.0348
+Inact: 0.9652 [INACTIVE]","Cyt: 0.1238
+Safe: 0.8762 [SAFE]",SUCCESS
+No Image,187022-11-3,Resolution Failed,-,-,FAILED
+No Image,194992-44-4,Resolution Failed,-,-,FAILED
+structure_8.png,142363-53-9,CCc1cccc(CC)c1N(COC)C(=O)C[S](O)(=O)=O,"Act: 0.0425
+Inact: 0.9575 [INACTIVE]","Cyt: 0.1077
+Safe: 0.8923 [SAFE]",SUCCESS
+No Image,171262-17-2,Resolution Failed,-,-,FAILED
+No Image,171118-09-5,Resolution Failed,-,-,FAILED
+No Image,152019-73-3,Resolution Failed,-,-,FAILED
+No Image,757124-72-4,Resolution Failed,-,-,FAILED
+structure_13.png,27619-97-2,O[S](=O)(=O)CCC(F)(F)C(F)(F)C(F)(F)C(F)(F)C(F)(F)C(F)(F)F,"Act: 0.0066
+Inact: 0.9934 [INACTIVE]","Cyt: 0.1252
+Safe: 0.8748 [SAFE]",SUCCESS
+structure_14.png,39108-34-4,O[S](=O)(=O)CCC(F)(F)C(F)(F)C(F)(F)C(F)(F)C(F)(F)C(F)(F)C(F)(F)C(F)(F)F,"Act: 0.0069
+Inact: 0.9931 [INACTIVE]","Cyt: 0.1442
+Safe: 0.8558 [SAFE]",SUCCESS
+structure_15.png,13252-13-6,OC(=O)C(F)(OC(F)(F)C(F)(F)C(F)(F)F)C(F)(F)F,"Act: 0.0197
+Inact: 0.9803 [INACTIVE]","Cyt: 0.0386
+Safe: 0.9614 [SAFE]",SUCCESS
+No Image,919005-14-4,Resolution Failed,-,-,FAILED
+No Image,756426-58-1,Resolution Failed,-,-,FAILED
+No Image,763051-92-9,Resolution Failed,-,-,FAILED
+structure_19.png,377-73-1,OC(=O)C(F)(F)C(F)(F)OC(F)(F)F,"Act: 0.0217
+Inact: 0.9783 [INACTIVE]","Cyt: 0.0199
+Safe: 0.9801 [SAFE]",SUCCESS
+No Image,863090-89-5,Resolution Failed,-,-,FAILED

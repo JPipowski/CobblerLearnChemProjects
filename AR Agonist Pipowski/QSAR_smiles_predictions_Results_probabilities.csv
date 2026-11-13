@@ -1,0 +1,34 @@
+Structure,Input SMILES,Agonist (Act / Inact),Viability (Cyt / Safe),Status
+structure_1.png,CC(C)CC(C)NC1=CC(=O)C(=CC1=O)NC2=CC=CC=C2,"Act: 0.0689
+Inact: 0.9311 [INACTIVE]","Cyt: 0.2481
+Safe: 0.7519 [SAFE]",SUCCESS
+structure_2.png,CCC1=CC=CC(=C1N(COCC)C(=O)CS(=O)(=O)O)C,"Act: 0.0371
+Inact: 0.9629 [INACTIVE]","Cyt: 0.0651
+Safe: 0.9349 [SAFE]",SUCCESS
+structure_3.png,CCC1=CC=CC(=C1N(COCC)C(=O)C(=O)O)C,"Act: 0.0274
+Inact: 0.9726 [INACTIVE]","Cyt: 0.0723
+Safe: 0.9277 [SAFE]",SUCCESS
+structure_4.png,CCC1=C(C(=CC=C1)CC)N(COC)C(=O)C(=O)O,"Act: 0.0422
+Inact: 0.9578 [INACTIVE]","Cyt: 0.0892
+Safe: 0.9108 [SAFE]",SUCCESS
+structure_5.png,CCC1=CC=CC(=C1N(C(C)COC)C(=O)CS(=O)(=O)O)C,"Act: 0.4119
+Inact: 0.5881 [INACTIVE]","Cyt: 0.0625
+Safe: 0.9375 [SAFE]",SUCCESS
+structure_6.png,CCC1=CC=CC(=C1N(C(C)COC)C(=O)C(=O)O)C,"Act: 0.2643
+Inact: 0.7357 [INACTIVE]","Cyt: 0.0560
+Safe: 0.9440 [SAFE]",SUCCESS
+structure_7.png,C(CS(=O)(=O)O)C(C(C(C(F)(F)F)(F)F)(F)F)(F)F,"Act: 0.0111
+Inact: 0.9889 [INACTIVE]","Cyt: 0.0939
+Safe: 0.9061 [SAFE]",SUCCESS
+structure_8.png,C(C(C(=O)O)(F)F)(OC(C(C(OC(F)(F)F)(F)F)(F)F)(F)F)F,"Act: 0.0474
+Inact: 0.9526 [INACTIVE]","Cyt: 0.0829
+Safe: 0.9171 [SAFE]",SUCCESS
+structure_9.png,C(C(C(C(F)(F)Cl)(F)F)(F)F)(C(C(OC(C(F)(F)S(=O)(=O)O)(F)F)(F)F)(F)F)(F)F,"Act: 0.0766
+Inact: 0.9234 [INACTIVE]","Cyt: 0.0730
+Safe: 0.9270 [SAFE]",SUCCESS
+structure_10.png,C(C(C(C(C(F)(F)Cl)(F)F)(F)F)(F)F)(C(C(C(OC(C(F)(F)S(=O)(=O)O)(F)F)(F)F)(F)F)(F)F)(F)F,"Act: 0.0723
+Inact: 0.9277 [INACTIVE]","Cyt: 0.0754
+Safe: 0.9246 [SAFE]",SUCCESS
+structure_11.png,C(=O)(C(C(C(OC(F)(F)F)(F)F)(F)F)(F)F)O,"Act: 0.0167
+Inact: 0.9833 [INACTIVE]","Cyt: 0.0252
+Safe: 0.9748 [SAFE]",SUCCESS

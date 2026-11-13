@@ -1,0 +1,21 @@
+No.,Candidate,Cas RN,SMILES String,Structure,Resolved SMILES,Agonist Prob,Viability Prob,Status,Input SMILES
+1, 6PPD-quinone,2754428-18-5,CC(C)CC(C)NC1=CC(=O)C(=CC1=O)NC2=CC=CC=C2,[Structure Image],Resolution Failed,0.0689 (INACTIVE),0.2481 (SAFE),SUCCESS,CC(C)CC(C)NC1=CC(=O)C(=CC1=O)NC2=CC=CC=C2
+2,"Carbamazepine 10,11-diol ",35079-97-1,C1=CC=C2C(=C1)C(C(C3=CC=CC=C3N2C(=O)N)O)O,[Structure Image],NC(=O)N1c2ccccc2C(O)C(O)c3ccccc13,0.0157 (INACTIVE),0.1128 (SAFE),SUCCESS,
+3,N-Desmethylcitalopram ,62498-67-3,CNCCCC1(C2=C(CO1)C=C(C=C2)C#N)C3=CC=C(C=C3)F,[Structure Image],CNCCCC1(OCc2cc(ccc12)C#N)c3ccc(F)cc3,0.0544 (INACTIVE),0.4689 (CYTOTOXIC),SUCCESS,
+4,O-Desmethylvenlafaxine,93413-62-8,CN(C)CC(C1=CC=C(C=C1)O)C2(CCCCC2)O,[Structure Image],CN(C)CC(c1ccc(O)cc1)C2(O)CCCCC2,0.0439 (INACTIVE),0.0624 (SAFE),SUCCESS,
+5,10-Hydroxycarbazepine (licarbazepine) ,29331-92-8,C1C(C2=CC=CC=C2N(C3=CC=CC=C31)C(=O)N)O,[Structure Image],NC(=O)N1c2ccccc2CC(O)c3ccccc13,0.0348 (INACTIVE),0.1238 (SAFE),SUCCESS,
+6,Acetochlor ESA,187022-11-3,CCC1=CC=CC(=C1N(COCC)C(=O)CS(=O)(=O)O)C,[Structure Image],Resolution Failed,0.0371 (INACTIVE),0.0651 (SAFE),SUCCESS,CCC1=CC=CC(=C1N(COCC)C(=O)CS(=O)(=O)O)C
+7,Acetochlor OA,194992-44-4,CCC1=CC=CC(=C1N(COCC)C(=O)C(=O)O)C,[Structure Image],Resolution Failed,0.0274 (INACTIVE),0.0723 (SAFE),SUCCESS,CCC1=CC=CC(=C1N(COCC)C(=O)C(=O)O)C
+8,Alachlor ESA,142363-53-9,CCC1=C(C(=CC=C1)CC)N(COC)C(=O)CS(=O)(=O)O,[Structure Image],CCc1cccc(CC)c1N(COC)C(=O)C[S](O)(=O)=O,0.0425 (INACTIVE),0.1077 (SAFE),SUCCESS,
+9,Alachlor OA,171262-17-2,CCC1=C(C(=CC=C1)CC)N(COC)C(=O)C(=O)O,[Structure Image],Resolution Failed,0.0422 (INACTIVE),0.0892 (SAFE),SUCCESS,CCC1=C(C(=CC=C1)CC)N(COC)C(=O)C(=O)O
+10,Metolachlor ESA,171118-09-5,CCC1=CC=CC(=C1N(C(C)COC)C(=O)CS(=O)(=O)O)C,[Structure Image],Resolution Failed,0.4119 (INACTIVE),0.0625 (SAFE),SUCCESS,CCC1=CC=CC(=C1N(C(C)COC)C(=O)CS(=O)(=O)O)C
+11,Metolachlor OA,152019-73-3,CCC1=CC=CC(=C1N(C(C)COC)C(=O)C(=O)O)C,[Structure Image],Resolution Failed,0.2643 (INACTIVE),0.0560 (SAFE),SUCCESS,CCC1=CC=CC(=C1N(C(C)COC)C(=O)C(=O)O)C
+12,4:2 FTS ,757124-72-4,C(CS(=O)(=O)O)C(C(C(C(F)(F)F)(F)F)(F)F)(F)F,,Resolution Failed,,,,
+13, 6:2 FTS,27619-97-2,C(CS(=O)(=O)O)C(C(C(C(C(C(F)(F)F)(F)F)(F)F)(F)F)(F)F)(F)F,[Structure Image],O[S](=O)(=O)CCC(F)(F)C(F)(F)C(F)(F)C(F)(F)C(F)(F)C(F)(F)F,0.0066 (INACTIVE),0.1252 (SAFE),SUCCESS,
+14,8:2 FTS ,39108-34-4,C(CS(=O)(=O)O)C(C(C(C(C(C(C(C(F)(F)F)(F)F)(F)F)(F)F)(F)F)(F)F)(F)F)(F)F,[Structure Image],O[S](=O)(=O)CCC(F)(F)C(F)(F)C(F)(F)C(F)(F)C(F)(F)C(F)(F)C(F)(F)C(F)(F)F,0.0069 (INACTIVE),0.1442 (SAFE),SUCCESS,
+15,HFPO-DA,13252-13-6 ,C(=O)(C(C(F)(F)F)(OC(C(C(F)(F)F)(F)F)(F)F)F)O,,,,,,
+16,ADONA (free acid),919005-14-4,C(C(C(=O)O)(F)F)(OC(C(C(OC(F)(F)F)(F)F)(F)F)(F)F)F,[Structure Image],Resolution Failed,0.0474 (INACTIVE),0.0829 (SAFE),SUCCESS,C(C(C(=O)O)(F)F)(OC(C(C(OC(F)(F)F)(F)F)(F)F)(F)F)F
+17,9Cl-PF3ONS ,756426-58-1,C(C(C(C(F)(F)Cl)(F)F)(F)F)(C(C(OC(C(F)(F)S(=O)(=O)O)(F)F)(F)F)(F)F)(F)F,[Structure Image],Resolution Failed,0.0766 (INACTIVE),0.0730 (SAFE),SUCCESS,C(C(C(C(F)(F)Cl)(F)F)(F)F)(C(C(OC(C(F)(F)S(=O)(=O)O)(F)F)(F)F)(F)F)(F)F
+18,11Cl-PF3OUdS,763051-92-9,C(C(C(C(C(F)(F)Cl)(F)F)(F)F)(F)F)(C(C(C(OC(C(F)(F)S(=O)(=O)O)(F)F)(F)F)(F)F)(F)F)(F)F,[Structure Image],Resolution Failed,0.0723 (INACTIVE),0.0754 (SAFE),SUCCESS,C(C(C(C(C(F)(F)Cl)(F)F)(F)F)(F)F)(C(C(C(OC(C(F)(F)S(=O)(=O)O)(F)F)(F)F)(F)F)(F)F)(F)F
+19,PFMPA,377-73-1,C(=O)(C(C(OC(F)(F)F)(F)F)(F)F)O,[Structure Image],OC(=O)C(F)(F)C(F)(F)OC(F)(F)F,0.0217 (INACTIVE),0.0199 (SAFE),SUCCESS,
+20,PFMBA,863090-89-5 ,C(=O)(C(C(C(OC(F)(F)F)(F)F)(F)F)(F)F)O,[Structure Image],,0.0167 (INACTIVE),0.0252 (SAFE),SUCCESS,C(=O)(C(C(C(OC(F)(F)F)(F)F)(F)F)(F)F)O
