@@ -53,10 +53,6 @@ def cas_to_smiles(cas_number):
 
 
 def validate_molecule_structure(mol, min_mw=10.0, max_mw=1000.0, min_heavy_atoms=2, max_heavy_atoms=100):
-    """
-    Validates an RDKit molecule object for chemical sanity, size boundaries,
-    and structural alerts before running QSAR inference.
-    """
     if mol is None:
         return False, "FAILED", "Could not parse SMILES string into a molecular graph."
 
@@ -118,11 +114,13 @@ class ModelTrainingWorker(QThread):
             ])
 
             cv = StratifiedKFold(n_splits=5, shuffle=True, random_state=42)
-            base_rf_cv = RandomForestClassifier(n_estimators=100, class_weight="balanced", random_state=42, n_jobs=-1)
-            multi_rf_cv = MultiOutputClassifier(base_rf_cv, n_jobs=-1)
 
-            base_xgb_cv = xgb.XGBClassifier(n_estimators=100, eval_metric="aucpr", random_state=42, n_jobs=-1)
-            multi_xgb_cv = MultiOutputClassifier(base_xgb_cv, n_jobs=-1)
+            # n_jobs set to None / 1 to prevent multiprocessing spawn crashes in standalone exe
+            base_rf_cv = RandomForestClassifier(n_estimators=100, class_weight="balanced", random_state=42, n_jobs=None)
+            multi_rf_cv = MultiOutputClassifier(base_rf_cv, n_jobs=None)
+
+            base_xgb_cv = xgb.XGBClassifier(n_estimators=100, eval_metric="aucpr", random_state=42, n_jobs=1)
+            multi_xgb_cv = MultiOutputClassifier(base_xgb_cv, n_jobs=None)
 
             y_true_ag, y_prob_ag = [], []
             y_true_vi, y_prob_vi = [], []
@@ -156,11 +154,11 @@ class ModelTrainingWorker(QThread):
             opt_thresh_ag = find_optimal_threshold(y_true_ag, y_prob_ag)
             opt_thresh_vi = find_optimal_threshold(y_true_vi, y_prob_vi)
 
-            base_rf = RandomForestClassifier(n_estimators=100, class_weight="balanced", random_state=42, n_jobs=-1)
-            multi_rf = MultiOutputClassifier(base_rf, n_jobs=-1)
+            base_rf = RandomForestClassifier(n_estimators=100, class_weight="balanced", random_state=42, n_jobs=None)
+            multi_rf = MultiOutputClassifier(base_rf, n_jobs=None)
 
-            base_xgb = xgb.XGBClassifier(n_estimators=100, eval_metric="aucpr", random_state=42, n_jobs=-1)
-            multi_xgb = MultiOutputClassifier(base_xgb, n_jobs=-1)
+            base_xgb = xgb.XGBClassifier(n_estimators=100, eval_metric="aucpr", random_state=42, n_jobs=1)
+            multi_xgb = MultiOutputClassifier(base_xgb, n_jobs=None)
 
             multi_rf.fit(X_train_full, Y_train_full)
             multi_xgb.fit(X_train_full, Y_train_full)
