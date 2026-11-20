@@ -26,6 +26,7 @@ from PyQt6.QtCore import Qt, QThread, pyqtSignal
 
 from matplotlib.backends.backend_qtagg import FigureCanvasQTAgg
 from matplotlib.figure import Figure
+from matplotlib.backends.backend_pdf import PdfPages
 
 
 def resource_path(relative_path):
@@ -115,7 +116,6 @@ class ModelTrainingWorker(QThread):
 
             cv = StratifiedKFold(n_splits=5, shuffle=True, random_state=42)
 
-            # n_jobs set to None / 1 to prevent multiprocessing spawn crashes in standalone exe
             base_rf_cv = RandomForestClassifier(n_estimators=100, class_weight="balanced", random_state=42, n_jobs=None)
             multi_rf_cv = MultiOutputClassifier(base_rf_cv, n_jobs=None)
 
@@ -272,7 +272,7 @@ class ROCTab(QWidget):
 
         layout = QVBoxLayout(self)
         layout.addWidget(QLabel(
-            "<b>Interactive ROC Curve & Confusion Matrix Explorer</b><br>Move slider to test thresholds, update live screening, or export plots and metrics."))
+            "<b>Interactive ROC Curve & Confusion Matrix Explorer</b><br>Move slider to test thresholds, update live screening, or export individual figures and bundled reports."))
 
         plots_layout = QHBoxLayout()
 
@@ -301,7 +301,7 @@ class ROCTab(QWidget):
         layout.addLayout(slider_layout)
 
         btn_layout = QHBoxLayout()
-        self.apply_btn = QPushButton("Apply as Active Screening Threshold")
+        self.apply_btn = QPushButton("Apply Threshold")
         self.apply_btn.setStyleSheet("background-color: #d4efdf; color: #145a32; font-weight: bold; padding: 6px;")
         self.apply_btn.clicked.connect(self.apply_threshold)
         btn_layout.addWidget(self.apply_btn)
@@ -310,11 +310,20 @@ class ROCTab(QWidget):
         self.export_plot_btn.clicked.connect(self.export_roc_curve)
         btn_layout.addWidget(self.export_plot_btn)
 
-        self.export_cm_btn = QPushButton("Export Metrics Summary")
+        self.export_cm_plot_btn = QPushButton("Export CM Plot")
+        self.export_cm_plot_btn.clicked.connect(self.export_confusion_matrix_plot)
+        btn_layout.addWidget(self.export_cm_plot_btn)
+
+        self.export_pdf_btn = QPushButton("Export All-in-One PDF Report")
+        self.export_pdf_btn.setStyleSheet("background-color: #ebf5fb; color: #1b4f72; font-weight: bold;")
+        self.export_pdf_btn.clicked.connect(self.export_comprehensive_pdf_report)
+        btn_layout.addWidget(self.export_pdf_btn)
+
+        self.export_cm_btn = QPushButton("Export Metrics Text")
         self.export_cm_btn.clicked.connect(self.export_metrics_report)
         btn_layout.addWidget(self.export_cm_btn)
 
-        self.reset_btn = QPushButton("Reset to Default")
+        self.reset_btn = QPushButton("Reset")
         self.reset_btn.clicked.connect(lambda: self.slider.setValue(int(self.default_thresh * 100)))
         btn_layout.addWidget(self.reset_btn)
 
@@ -432,6 +441,62 @@ class ROCTab(QWidget):
             QMessageBox.information(self, "Success", f"ROC curve plot exported to:\n{path}")
         except Exception as e:
             QMessageBox.critical(self, "Export Error", f"Failed to export ROC curve:\n{str(e)}")
+
+    def export_confusion_matrix_plot(self):
+        path, _ = QFileDialog.getSaveFileName(self, "Export Confusion Matrix Plot",
+                                              f"confusion_matrix_thresh_{self.current_thresh:.2f}.png",
+                                              "PNG Files (*.png);;PDF Files (*.pdf)")
+        if not path:
+            return
+        try:
+            self.fig_cm.savefig(path, dpi=300, bbox_inches='tight')
+            QMessageBox.information(self, "Success", f"Confusion matrix plot exported to:\n{path}")
+        except Exception as e:
+            QMessageBox.critical(self, "Export Error", f"Failed to export confusion matrix plot:\n{str(e)}")
+
+    def export_comprehensive_pdf_report(self):
+        path, _ = QFileDialog.getSaveFileName(self, "Export Comprehensive PDF Report",
+                                              f"qsar_model_report_thresh_{self.current_thresh:.2f}.pdf",
+                                              "PDF Files (*.pdf)")
+        if not path:
+            return
+        try:
+            preds = (self.y_scores >= self.current_thresh).astype(int)
+            tn, fp, fn, tp = confusion_matrix(self.y_true, preds).ravel()
+            tpr = tp / (tp + fn) if (tp + fn) > 0 else 0.0
+            precision = tp / (tp + fp) if (tp + fp) > 0 else 0.0
+            f1 = (2 * tp) / (2 * tp + fp + fn) if (2 * tp + fp + fn) > 0 else 0.0
+
+            with PdfPages(path) as pdf:
+                pdf.savefig(self.fig, bbox_inches='tight')
+                pdf.savefig(self.fig_cm, bbox_inches='tight')
+
+                fig_text = Figure(figsize=(8, 6))
+                ax_text = fig_text.add_subplot(111)
+                ax_text.axis('off')
+
+                report_content = f"""QSAR Model Performance & Evaluation Report
+==================================================
+Threshold Evaluated: {self.current_thresh:.2f}
+ROC AUC: {self.roc_auc:.4f}
+
+Confusion Matrix Counts:
+- True Positives (TP): {tp}
+- False Positives (FP): {fp}
+- True Negatives (TN): {tn}
+- False Negatives (FN): {fn}
+
+Key Metrics:
+- Sensitivity (Recall / TPR): {tpr:.4f}
+- Precision: {precision:.4f}
+- F1-Score: {f1:.4f}
+"""
+                ax_text.text(0.1, 0.5, report_content, fontsize=12, family='monospace', verticalalignment='center')
+                pdf.savefig(fig_text, bbox_inches='tight')
+
+            QMessageBox.information(self, "Success", f"Comprehensive PDF report successfully saved to:\n{path}")
+        except Exception as e:
+            QMessageBox.critical(self, "Export Error", f"Failed to generate PDF report:\n{str(e)}")
 
     def export_metrics_report(self):
         path, _ = QFileDialog.getSaveFileName(self, "Export Metrics Report", "model_metrics_report.txt",
@@ -553,7 +618,7 @@ class QSARApp(QMainWindow):
         self.predict_btn_cas.clicked.connect(self.run_batch_cas_predictions)
         btn_layout_cas.addWidget(self.predict_btn_cas)
 
-        export_btn_cas = QPushButton("Export to CSV & Save Images")
+        export_btn_cas = QPushButton("Export to CSV")
         export_btn_cas.clicked.connect(lambda: self.export_table_to_csv(self.table_cas, "cas_predictions.csv"))
         btn_layout_cas.addWidget(export_btn_cas)
 
@@ -595,7 +660,7 @@ class QSARApp(QMainWindow):
         self.predict_btn_smi.clicked.connect(self.run_batch_smi_predictions)
         btn_layout_smi.addWidget(self.predict_btn_smi)
 
-        export_btn_smi = QPushButton("Export to CSV & Save Images")
+        export_btn_smi = QPushButton("Export to CSV")
         export_btn_smi.clicked.connect(lambda: self.export_table_to_csv(self.table_smi, "smiles_predictions.csv"))
         btn_layout_smi.addWidget(export_btn_smi)
 
@@ -740,88 +805,49 @@ class QSARApp(QMainWindow):
                     else:
                         item.setBackground(QColor(250, 219, 216))
                         item.setForeground(QColor(120, 40, 31))
-                elif "Viability" in header_label:
-                    if vi_status == "SAFE":
+                elif "Viability (" in header_label:
+                    if vi_status == "CYTOTOXIC":
+                        item.setBackground(QColor(252, 243, 207))
+                        item.setForeground(QColor(125, 102, 8))
+                    else:
                         item.setBackground(QColor(212, 239, 223))
                         item.setForeground(QColor(20, 90, 50))
-                    else:
-                        item.setBackground(QColor(250, 219, 216))
-                        item.setForeground(QColor(120, 40, 31))
                 elif "AR Agonist Call" in header_label:
                     if ar_call == "Confirmed AR Agonist":
                         item.setBackground(QColor(212, 239, 223))
                         item.setForeground(QColor(20, 90, 50))
-                    elif ar_call == "Inconclusive (Cytotoxic)":
+                    elif "Inconclusive" in ar_call:
                         item.setBackground(QColor(252, 243, 207))
                         item.setForeground(QColor(125, 102, 8))
                     else:
-                        item.setBackground(QColor(250, 219, 216))
-                        item.setForeground(QColor(120, 40, 31))
+                        item.setBackground(QColor(234, 237, 237))
+                        item.setForeground(QColor(41, 128, 185))
 
+            item.setTextAlignment(Qt.AlignmentFlag.AlignCenter)
             table.setItem(row, col_idx, item)
 
     def export_table_to_csv(self, table, default_filename):
-        if table.rowCount() == 0:
-            QMessageBox.warning(self, "Export Warning", "There are no prediction results to export.")
-            return
-
-        path, _ = QFileDialog.getSaveFileName(self, "Export Results to CSV", default_filename,
+        path, _ = QFileDialog.getSaveFileName(self, "Export Results", default_filename,
                                               "CSV Files (*.csv);;All Files (*)")
         if not path:
             return
-
         try:
-            base_dir = os.path.dirname(path)
-            base_name = os.path.splitext(os.path.basename(path))[0]
-            img_folder = os.path.join(base_dir, f"{base_name}_images")
-            os.makedirs(img_folder, exist_ok=True)
-
-            rows = table.rowCount()
-            cols = table.columnCount()
-            headers = [table.horizontalHeaderItem(i).text() for i in range(cols)]
-
-            smiles_col_idx = -1
-            for i in range(cols):
-                if "SMILES" in headers[i]:
-                    smiles_col_idx = i
-                    break
-
+            headers = [table.horizontalHeaderItem(i).text() for i in range(table.columnCount())]
             data = []
-            for r in range(rows):
+            for row in range(table.rowCount()):
                 row_data = []
-                smiles_str = None
-
-                for c in range(cols):
-                    item = table.item(r, c)
-                    if item is not None:
-                        val = item.text()
-                        row_data.append(val)
-                        if c == smiles_col_idx:
-                            smiles_str = val
-                    else:
-                        row_data.append("")
-
-                img_filename = ""
-                if smiles_str and smiles_str not in ["Resolution Failed", "-", "FAILED"]:
-                    mol = Chem.MolFromSmiles(smiles_str)
-                    if mol is not None:
-                        img_filename = f"structure_{r + 1}.png"
-                        img_path = os.path.join(img_folder, img_filename)
-                        img = Draw.MolToImage(mol, size=(300, 300))
-                        img.save(img_path)
-
-                row_data[0] = img_filename if img_filename else "No Image"
+                for col in range(table.columnCount()):
+                    item = table.item(row, col)
+                    row_data.append(item.text() if item else "")
                 data.append(row_data)
 
-            df_export = pd.DataFrame(data, columns=headers)
-            df_export.to_csv(path, index=False)
-
-            QMessageBox.information(
-                self, "Success",
-                f"Results successfully exported to:\n{path}\n\nStructure images saved in folder:\n{img_folder}"
-            )
+            export_df = pd.DataFrame(data, columns=headers)
+            if "Structure" in export_df.columns:
+                export_df = export_df.drop(columns=["Structure"])
+            export_df.to_csv(path, index=False)
+            QMessageBox.information(self, "Export Success", f"Results successfully exported to:\n{path}")
         except Exception as e:
-            QMessageBox.critical(self, "Export Error", f"Failed to export results:\n{str(e)}")
+            QMessageBox.critical(self, "Export Error", f"Failed to export table:\n{str(e)}")
 
 
 if __name__ == "__main__":
